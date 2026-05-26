@@ -1,0 +1,212 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+const projects = await getCollection('projects');
+const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+
+const projectsWithContent = await Promise.all(
+	sortedProjects.map(async (project) => {
+		const { Content } = await render(project);
+		return { project, Content };
+	})
+);
+---
+
+<Layout title="Projects | seldas Research" description="Research projects and software tools shared by seldas on GitHub, including LabelComp and HetEnc.">
+	<div class="container">
+		<header class="page-header">
+			<h1 class="page-title">Research Projects</h1>
+			<p class="page-subtitle">Open-source software, models, and analytical tools developed for bioinformatics and clinical NLP applications.</p>
+		</header>
+
+		<div class="projects-list">
+			{projectsWithContent.map(({ project, Content }) => (
+				<article class="project-detail-card">
+					<div class="project-meta-side">
+						<div class="meta-item">
+							<span class="meta-label">Status</span>
+							<span class={`badge ${project.data.status === 'Active' ? 'badge-active' : ''}`}>{project.data.status}</span>
+						</div>
+						<div class="meta-item">
+							<span class="meta-label">Source Code</span>
+							<a href={project.data.github} target="_blank" rel="noopener noreferrer" class="github-link-btn">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+								Repository
+							</a>
+						</div>
+						<div class="meta-item">
+							<span class="meta-label">Technologies</span>
+							<div class="tech-tags">
+								{project.data.tags.map(tag => (
+									<span class="badge">{tag}</span>
+								))}
+							</div>
+						</div>
+					</div>
+
+					<div class="project-content-side">
+						<h2 class="project-title">{project.data.title}</h2>
+						<p class="project-brief-desc">{project.data.description}</p>
+						<hr class="divider"/>
+						<div class="markdown-body">
+							<Content />
+						</div>
+					</div>
+				</article>
+			))}
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.page-header {
+		margin-bottom: 3rem;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 1.5rem;
+	}
+	.page-title {
+		font-size: 2.2rem;
+		font-family: var(--font-sans);
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+	}
+	.page-subtitle {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+	}
+
+	.projects-list {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		margin-bottom: 4rem;
+	}
+
+	.project-detail-card {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		display: grid;
+		grid-template-columns: 1fr;
+		overflow: hidden;
+	}
+
+	@media (min-width: 768px) {
+		.project-detail-card {
+			grid-template-columns: 240px 1fr;
+		}
+	}
+
+	/* Metadata column */
+	.project-meta-side {
+		background: rgba(0, 0, 0, 0.01);
+		border-bottom: 1px solid var(--border-color);
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	@media (min-width: 768px) {
+		.project-meta-side {
+			border-bottom: none;
+			border-right: 1px solid var(--border-color);
+		}
+	}
+
+	.meta-label {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-muted);
+		margin-bottom: 0.25rem;
+		font-weight: 600;
+	}
+
+	.github-link-btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.35rem 0.75rem;
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		color: var(--text-primary);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.github-link-btn:hover {
+		background: #f5f5f5;
+		border-color: var(--accent-color);
+	}
+
+	.tech-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	/* Content column */
+	.project-content-side {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.project-title {
+		font-size: 1.5rem;
+		font-family: var(--font-sans);
+		margin-bottom: 0.5rem;
+	}
+
+	.project-brief-desc {
+		color: var(--text-secondary);
+		font-size: 1rem;
+		line-height: 1.5;
+		margin-bottom: 1rem;
+	}
+
+	.divider {
+		border: none;
+		border-top: 1px solid var(--border-color);
+		margin-bottom: 1rem;
+	}
+
+	/* Inner markdown rendering style */
+	.markdown-body {
+		color: var(--text-secondary);
+		font-size: 0.95rem;
+		line-height: 1.6;
+	}
+
+	.markdown-body :global(h3) {
+		font-family: var(--font-sans);
+		font-size: 1.1rem;
+		margin-top: 1.25rem;
+		margin-bottom: 0.5rem;
+		color: var(--text-primary);
+	}
+
+	.markdown-body :global(ul) {
+		padding-left: 1.25rem;
+		margin-bottom: 1rem;
+	}
+
+	.markdown-body :global(li) {
+		margin-bottom: 0.25rem;
+	}
+
+	.markdown-body :global(p) {
+		margin-bottom: 1rem;
+	}
+
+	.markdown-body :global(strong) {
+		color: var(--text-primary);
+	}
+</style>

@@ -1,0 +1,217 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const updates = await getCollection('updates');
+const sortedUpdates = updates.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Layout title="Updates Log | seldas Research" description="Chronological research updates, logs, and experiment notes for projects like LabelComp and HetEnc.">
+	<div class="container">
+		<header class="page-header">
+			<h1 class="page-title">Research Updates</h1>
+			<p class="page-subtitle">A chronological record of pipeline releases, model validations, and technical updates.</p>
+		</header>
+
+		<div class="timeline-container">
+			<div class="timeline-line"></div>
+			
+			<div class="timeline-items">
+				{sortedUpdates.map((update, index) => {
+					const dateStr = update.data.date.toLocaleDateString('en-US', {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					});
+					
+					return (
+						<div class="timeline-item">
+							<div class="timeline-dot-wrapper">
+								<div class="timeline-dot"></div>
+							</div>
+							
+							<div class="timeline-content-wrapper">
+								<div class="card timeline-card">
+									<div class="update-meta">
+										<time class="update-date">{dateStr}</time>
+										{update.data.project && (
+											<span class="badge badge-update">{update.data.project}</span>
+										)}
+									</div>
+									<h2 class="update-title">
+										<a href={`/updates/${update.id}`}>{update.data.title}</a>
+									</h2>
+									{update.data.description ? (
+										<p class="update-description">{update.data.description}</p>
+									) : (
+										<p class="update-description">Click below to read the full technical logs and details of this research update...</p>
+									)}
+									<div class="update-footer">
+										<div class="update-tags">
+											{update.data.tags.map(tag => (
+												<span class="badge">{tag}</span>
+											))}
+										</div>
+										<a href={`/updates/${update.id}`} class="read-more-link">
+											Read Full Log →
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.page-header {
+		margin-bottom: 3rem;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 1.5rem;
+	}
+	.page-title {
+		font-size: 2.2rem;
+		font-family: var(--font-sans);
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+	}
+	.page-subtitle {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+	}
+
+	/* Timeline styles */
+	.timeline-container {
+		position: relative;
+		max-width: 720px;
+		padding-left: 2rem;
+	}
+
+	.timeline-line {
+		position: absolute;
+		left: 7px;
+		top: 12px;
+		bottom: 12px;
+		width: 1px;
+		background: var(--border-color);
+	}
+
+	.timeline-items {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	.timeline-item {
+		display: flex;
+		position: relative;
+	}
+
+	.timeline-dot-wrapper {
+		position: absolute;
+		left: -2rem;
+		top: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 16px;
+		height: 16px;
+		transform: translateX(-50%);
+	}
+
+	.timeline-dot {
+		width: 8px;
+		height: 8px;
+		background: #ffffff;
+		border: 1px solid var(--text-muted);
+		border-radius: 50%;
+		transition: all var(--transition-speed) ease;
+	}
+
+	.timeline-item:hover .timeline-dot {
+		border-color: var(--accent-color);
+		background: var(--accent-color);
+	}
+
+	.timeline-content-wrapper {
+		width: 100%;
+	}
+
+	.timeline-card {
+		padding: 1.25rem;
+	}
+
+	.update-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.update-date {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+
+	.update-title {
+		font-size: 1.35rem;
+		font-family: var(--font-sans);
+		margin-bottom: 0.75rem;
+	}
+
+	.update-title a {
+		text-decoration: none;
+		color: var(--text-primary);
+	}
+
+	.update-title a:hover {
+		color: var(--accent-color);
+		text-decoration: underline;
+	}
+
+	.update-description {
+		color: var(--text-secondary);
+		font-size: 0.95rem;
+		line-height: 1.6;
+		margin-bottom: 1rem;
+	}
+
+	.update-footer {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		justify-content: space-between;
+		border-top: 1px solid var(--border-color);
+		padding-top: 0.75rem;
+	}
+
+	@media (min-width: 640px) {
+		.update-footer {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	.update-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.read-more-link {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--accent-color);
+		text-decoration: none;
+	}
+
+	.read-more-link:hover {
+		text-decoration: underline;
+	}
+</style>
