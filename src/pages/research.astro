@@ -39,102 +39,6 @@ const publications = [
 			"<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.",
 			"<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews."
 		]
-	},
-	{
-		id: "hetenc-gene-expression-2025",
-		title: "Deep Learning for Gene Expression: Autoencoders & Biological Data Compression",
-		academicTitle: "Compressing high-dimensional transcriptomic profiles using deep autoencoders: A heterogeneous encoding framework",
-		journal: "Bioinformatics",
-		date: "January 2025",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1093/bioinformatics/btad891",
-		doiUrl: "https://academic.oup.com/bioinformatics",
-		summary: "High-dimensional gene expression databases present massive computational challenges for storage, querying, and transfer. This study introduces a deep autoencoder compression framework designed specifically to compress transcriptomic profiles into compact, low-dimensional latent embeddings while preserving critical biological pathways and phenotypes.",
-		highlights: [
-			"<strong>Dimensionality Reduction:</strong> Successfully compresses over 20,000 gene expression features down to a 128-dimensional latent vector.",
-			"<strong>Biological Fidelity:</strong> Downstream classification models trained on the compressed vectors show zero degradation in predicting cell types and cancer subclasses.",
-			"<strong>Latent Benchmarking:</strong> Demonstrates that neural autoencoder embeddings outperform traditional PCA and t-SNE algorithms for genomic similarity queries."
-		]
-	},
-	{
-		id: "biobert-ner-clinical-2024",
-		title: "BioBERT Named Entity Recognition for Extracting Adverse Events from Regulatory Documents",
-		academicTitle: "Named Entity Recognition in Structured Product Labeling (SPL) using Domain-Specific Bidirectional Transformers",
-		journal: "Journal of Biomedical Informatics",
-		date: "October 2024",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1016/j.jbi.2024.103982",
-		doiUrl: "https://www.sciencedirect.com/journal/journal-of-biomedical-informatics",
-		summary: "Automatically identifying adverse events from structured drug labels is difficult due to complex medical terminology. We fine-tuned BioBERT on a custom-annotated corpus of FDA label texts to recognize and extract safety warnings and contraindications with high precision.",
-		highlights: [
-			"<strong>Domain Fine-tuning:</strong> Achieved an AE entity extraction F1-score of <strong>0.895</strong> on unstructured labeling texts.",
-			"<strong>Fuzzy Entity Alignment:</strong> Built algorithms to align extracted entities with official MedDRA vocabulary dictionaries.",
-			"<strong>Pipeline Integration:</strong> Integrated as the core annotation engine in the AskMyFAERS safety intelligence platform."
-		]
-	},
-	{
-		id: "pgvector-optimization-2024",
-		title: "Scaling Regulatory Document Queries: pgvector & Database Indexing Benchmarks",
-		academicTitle: "High-performance vector database scaling in secure regulatory firewalls for clinical RAG applications",
-		journal: "Database Engineering & Science",
-		date: "August 2024",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1109/TDE.2024.31200",
-		doiUrl: "https://ieeexplore.ieee.org/",
-		summary: "Querying huge databases of drug labeling vectors becomes slow as the corpus grows. This paper benchmarks PostgreSQL's pgvector extension, optimizing IVFFlat and HNSW index settings for sub-second query retrieval times inside localized federal firewalls.",
-		highlights: [
-			"<strong>Index Optimization:</strong> Fine-tuned HNSW parameters (m, ef_construction) to reduce query latency by <strong>74%</strong>.",
-			"<strong>Sub-second Recall:</strong> Achieved 99.1% recall accuracy on drug label paragraphs within 15 milliseconds.",
-			"<strong>Offline Integration:</strong> Directly supports the localized search modules of FDA regulatory safety tools."
-		]
-	},
-	{
-		id: "sentence-embeddings-2024",
-		title: "Semantics in Regulation: Using Contrastive Sentence Embeddings to Align Drug Warnings",
-		academicTitle: "Evaluating contrastive sentence representations for semantic alignment of structured drug labels",
-		journal: "Clinical NLP Studies",
-		date: "June 2024",
-		authors: "Leihong Wu, et al.",
-		doi: "10.18653/v1/2024.clinicalnlp-1",
-		doiUrl: "https://aclanthology.org/",
-		summary: "Different drug manufacturers describe the same side effects using slightly different words. This study evaluates contrastive sentence representation models (like SBERT and BGE) to semantically align warning sections across competing drug labels, detecting hidden discrepancies.",
-		highlights: [
-			"<strong>Semantic Alignment:</strong> Pairs warnings describing identical physiological risks despite divergent wording.",
-			"<strong>Discrepancy Benchmarking:</strong> Automated checks successfully flagged hidden labeling warnings differences on 12 drug classes.",
-			"<strong>Fine-tuning Performance:</strong> Showed that contrastive loss fine-tuning on MedDRA terms boosts alignment accuracy by 18%."
-		]
-	},
-	{
-		id: "tauri-scientific-desktop-2024",
-		title: "Tauri v2 for Scientific Applications: Building Offline-First Desktop Utilities",
-		academicTitle: "Offline-first scientific utility design using Tauri v2, Rust, and secure local database containers",
-		journal: "Software Engineering & Science",
-		date: "May 2024",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1145/3612345.3612350",
-		doiUrl: "https://dl.acm.org/",
-		summary: "Cloud-dependent scientific tools present significant security and offline-usability issues for researchers in isolated environments. This paper presents Tauri-based architectural strategies to host web frontends inside local desktop containers using Rust backends.",
-		highlights: [
-			"<strong>Security Isolation:</strong> Completely eliminates external network calls by storing citations and metadata locally.",
-			"<strong>Rust File System Access:</strong> Fast local file system manipulation for high-DPI figure conversions and citation parsing.",
-			"<strong>Cross-platform Bundles:</strong> Generates lightweight desktop packages (~10MB) for Windows, macOS, and Linux."
-		]
-	},
-	{
-		id: "genomics-ablation-study-2023",
-		title: "Ablation Analysis and Latent Representation Benchmarks for Gene Co-expression Networks",
-		academicTitle: "Benchmarking latent biological spaces: An ablation study of deep autoencoders in co-expression matrices",
-		journal: "Genomics Research Review",
-		date: "November 2023",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1016/j.ygeno.2023.104230",
-		doiUrl: "https://www.sciencedirect.com/journal/genomics",
-		summary: "Latent spaces produced by deep autoencoders are often treated as black boxes. We perform systematic ablation studies on neural networks trained on gene co-expression matrices to test how individual layers and nodes map to specific biological pathways.",
-		highlights: [
-			"<strong>Pathway Mapping:</strong> Identified that specific latent nodes correlate directly with immune response and cell cycle pathways.",
-			"<strong>Ablation Benchmarking:</strong> Systematically pruned autoencoder weights to identify minimum network sizes needed for representation.",
-			"<strong>Stability Analysis:</strong> Proven stability of the latent representations across multiple biological datasets."
-		]
 	}
 ];
 ---
@@ -228,19 +132,6 @@ const publications = [
 												<div class="arch-step">
 													<strong>Cardiotoxicity (DICT)</strong>
 													<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
-												</div>
-											</div>
-										</div>
-									)}
-									
-									{!["ae-classification-2025", "askfdalabel-framework-2024"].includes(pub.id) && (
-										<div class="architecture-card">
-											<h4>Article Info</h4>
-											<p>This peer-reviewed publication focuses on advancing machine learning in clinical bioinformatics pipelines.</p>
-											<div class="arch-flow">
-												<div class="arch-step">
-													<strong>Status</strong>
-													<span>Indexed & Published online. Full text traceable via DOI link.</span>
 												</div>
 											</div>
 										</div>
