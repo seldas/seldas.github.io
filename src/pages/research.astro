@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 
 const publications = [
 	{
+		id: "ae-classification-2025",
 		title: "AI-Powered Safety Screening: Enhancing Drug Adverse Event Classification with AskFDALabel",
 		academicTitle: "Leveraging FDA Labeling Documents and Large Language Model to Enhance Annotation, Profiling, and Classification of Drug Adverse Events with AskFDALabel",
 		journal: "Drug Safety",
@@ -21,6 +22,7 @@ const publications = [
 		]
 	},
 	{
+		id: "askfdalabel-framework-2024",
 		title: "Bringing Safe AI to Drug Regulation: The AskFDALabel Framework",
 		academicTitle: "A framework enabling LLMs into regulatory environment for transparency and trustworthiness and its application to drug labeling document",
 		journal: "Regulatory Toxicology and Pharmacology",
@@ -45,104 +47,180 @@ const publications = [
 	<div class="container container-wide">
 		<header class="page-header">
 			<h1 class="page-title">Research Publications</h1>
-			<p class="page-subtitle">Scientific papers and NLP frameworks developed for regulatory environments and clinical applications.</p>
+			<p class="page-subtitle">Scientific papers and NLP frameworks developed for regulatory environments and clinical safety.</p>
 		</header>
 
-		<div class="publications-list">
-			{publications.map((pub, index) => (
-				<article class="featured-paper-card" key={pub.doi}>
-					<div class="paper-header">
-						<div class="paper-meta">
-							<span class="journal-tag">{pub.journal}</span>
-							<span class="pub-date">Published {pub.date}</span>
-						</div>
-						<h2 class="paper-display-title">
-							{pub.title}
-						</h2>
-						<p class="paper-academic-title">
-							<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
-						</p>
-						<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
-					</div>
-
-					<div class="paper-grid">
-						<div class="paper-summary-column">
-							<h3 class="column-title">Plain Language Summary</h3>
-							<div class="plain-text-body">
-								<p>{pub.summary}</p>
-								
-								<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
-								<ul class="highlights-list">
-									{pub.highlights.map(hl => (
-										<li set:html={hl}></li>
-									))}
-								</ul>
+		<!-- Two-column Blog Grid Layout -->
+		<div class="research-layout-grid">
+			<!-- Main Blog Posts List -->
+			<main class="research-main-content">
+				<div class="publications-list">
+					{publications.map((pub, index) => (
+						<article class="blog-post-card" id={pub.id} key={pub.doi}>
+							<div class="paper-header">
+								<div class="paper-meta">
+									<span class="journal-tag">{pub.journal}</span>
+									<span class="pub-date">Published {pub.date}</span>
+								</div>
+								<h2 class="paper-display-title">
+									{pub.title}
+								</h2>
+								<p class="paper-academic-title">
+									<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
+								</p>
+								<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
 							</div>
-						</div>
 
-						<div class="paper-actions-column">
-							<div class="action-card">
-								<h4>Resources</h4>
-								<p class="action-desc">Read the full scientific publication detailing the system architecture, performance benchmarks, and ablation studies.</p>
-								
-								<div class="action-buttons">
-									<a href={pub.pdfUrl} download class="btn btn-primary btn-full">
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-										Download PDF ({pub.pdfSize})
-									</a>
+							<div class="paper-grid">
+								<div class="paper-summary-column">
+									<h3 class="column-title">Plain Language Summary</h3>
+									<div class="plain-text-body">
+										<p>{pub.summary}</p>
+										
+										<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
+										<ul class="highlights-list">
+											{pub.highlights.map(hl => (
+												<li set:html={hl}></li>
+											))}
+										</ul>
+									</div>
+								</div>
+
+								<div class="paper-side-column">
+									{index === 1 && (
+										<div class="architecture-card">
+											<h4>AskFDALabel Flow</h4>
+											<p>Splits the regulatory query pipeline into two secure modules:</p>
+											<div class="arch-flow">
+												<div class="arch-step">
+													<strong>Module S: Semantic Search</strong>
+													<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
+												</div>
+												<div class="arch-arrow">&darr;</div>
+												<div class="arch-step">
+													<strong>Module T: Text Generation</strong>
+													<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
+												</div>
+											</div>
+										</div>
+									)}
 									
-									<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-										Journal Link
-									</a>
+									{index === 0 && (
+										<div class="architecture-card">
+											<h4>Safety Benchmarks</h4>
+											<p>Evaluation results demonstrating model performance:</p>
+											<div class="arch-flow">
+												<div class="arch-step">
+													<strong>Liver Injury (DILI)</strong>
+													<span>Classifies DILI risk with an outstanding F1-score of <strong>0.978</strong>.</span>
+												</div>
+												<div class="arch-step">
+													<strong>Cardiotoxicity (DICT)</strong>
+													<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
+												</div>
+											</div>
+										</div>
+									)}
 								</div>
 							</div>
-							
-							{index === 1 && (
-								<div class="architecture-card">
-									<h4>AskFDALabel Flow</h4>
-									<p>Splits the regulatory query pipeline into two secure modules:</p>
-									<div class="arch-flow">
-										<div class="arch-step">
-											<strong>Module S: Semantic Search</strong>
-											<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
-										</div>
-										<div class="arch-arrow">&darr;</div>
-										<div class="arch-step">
-											<strong>Module T: Text Generation</strong>
-											<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
-										</div>
-									</div>
-								</div>
-							)}
-							
-							{index === 0 && (
-								<div class="architecture-card">
-									<h4>Safety Benchmarks</h4>
-									<p>Evaluation results demonstrating model performance:</p>
-									<div class="arch-flow">
-										<div class="arch-step">
-											<strong>Liver Injury (DILI)</strong>
-											<span>Classifies DILI risk with an outstanding F1-score of <strong>0.978</strong>.</span>
-										</div>
-										<div class="arch-step">
-											<strong>Cardiotoxicity (DICT)</strong>
-											<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
-										</div>
-									</div>
-								</div>
-							)}
-						</div>
+
+							<!-- Action Buttons in Card Footer -->
+							<div class="post-footer-actions">
+								<a href={pub.pdfUrl} download class="btn btn-primary btn-sm">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+									Download PDF ({pub.pdfSize})
+								</a>
+								
+								<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+									View Publisher Journal
+								</a>
+							</div>
+						</article>
+					))}
+				</div>
+			</main>
+
+			<!-- Sticky Right Sidebar with Table of Contents -->
+			<aside class="research-sidebar">
+				<div class="sidebar-sticky-box">
+					<h3 class="sidebar-title">Table of Contents</h3>
+					<nav class="toc-nav">
+						<a href="#ae-classification-2025" class="toc-link">
+							<span class="toc-text">AI Safety Screening (2025)</span>
+						</a>
+						<a href="#askfdalabel-framework-2024" class="toc-link">
+							<span class="toc-text">Foundational Framework (2024)</span>
+						</a>
+					</nav>
+					
+					<div class="sidebar-extra-info">
+						<h4>Research Context</h4>
+						<p>These plain-language reviews focus on integrating Large Language Models safely into highly regulated environments like pharmacovigilance and drug label compliance.</p>
 					</div>
-				</article>
-			))}
+				</div>
+			</aside>
 		</div>
 	</div>
 </Layout>
 
+<script>
+	// Smooth Scroll and Active ToC Highlighting Script
+	document.addEventListener('DOMContentLoaded', () => {
+		const posts = document.querySelectorAll('.blog-post-card');
+		const tocLinks = document.querySelectorAll('.toc-link');
+
+		if (posts.length === 0 || tocLinks.length === 0) return;
+
+		// Intersection Observer to highlight ToC links during scroll
+		const observerOptions = {
+			root: null,
+			rootMargin: '-25% 0px -55% 0px',
+			threshold: 0
+		};
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					const activeId = entry.target.getAttribute('id');
+					tocLinks.forEach(link => {
+						const href = link.getAttribute('href');
+						if (href === `#${activeId}`) {
+							link.classList.add('active');
+						} else {
+							link.classList.remove('active');
+						}
+					});
+				}
+			});
+		}, observerOptions);
+
+		posts.forEach(post => observer.observe(post));
+
+		// Smooth scrolling with header offset subtraction
+		tocLinks.forEach(link => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const targetId = link.getAttribute('href')?.substring(1);
+				const targetEl = document.getElementById(targetId || '');
+				if (targetEl) {
+					const headerOffset = 90; // account for sticky header height + safety spacing
+					const elementPosition = targetEl.getBoundingClientRect().top;
+					const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+					
+					window.scrollTo({
+						top: offsetPosition,
+						behavior: 'smooth'
+					});
+				}
+			});
+		});
+	});
+</script>
+
 <style>
 	.container-wide {
-		max-width: 1000px;
+		max-width: 1100px;
 		margin: 0 auto;
 		padding: 0 1.5rem;
 	}
@@ -165,15 +243,32 @@ const publications = [
 		line-height: 1.5;
 	}
 
+	/* Two-column Blog Layout Grid */
+	.research-layout-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2.5rem;
+		margin-bottom: 5rem;
+	}
+
+	@media (min-width: 960px) {
+		.research-layout-grid {
+			grid-template-columns: 1fr 280px;
+		}
+	}
+
+	.research-main-content {
+		min-width: 0; /* Prevents flex/grid clipping */
+	}
+
 	.publications-list {
 		display: flex;
 		flex-direction: column;
 		gap: 3.5rem;
-		margin-bottom: 4rem;
 	}
 
-	/* Featured Paper Card */
-	.featured-paper-card {
+	/* Blog Post Card */
+	.blog-post-card {
 		background: var(--bg-panel);
 		border: 1px solid var(--border-color);
 		border-radius: 6px;
@@ -242,7 +337,7 @@ const publications = [
 		font-family: var(--font-mono);
 	}
 
-	/* Paper Grid Layout */
+	/* Paper Grid Layout (Inside Card) */
 	.paper-grid {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -251,7 +346,7 @@ const publications = [
 
 	@media (min-width: 768px) {
 		.paper-grid {
-			grid-template-columns: 1fr 300px;
+			grid-template-columns: 1fr 260px;
 		}
 	}
 
@@ -299,53 +394,28 @@ const publications = [
 		font-size: 0.95rem;
 	}
 
-	/* Sidebar Action and Architecture cards */
-	.paper-actions-column {
+	/* Side Column inside post card */
+	.paper-side-column {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
 	}
 
-	.action-card, .architecture-card {
+	.architecture-card {
 		background: #ffffff;
 		border: 1px solid var(--border-color);
 		border-radius: 4px;
 		padding: 1.25rem;
 	}
 
-	.action-card h4, .architecture-card h4 {
+	.architecture-card h4 {
 		font-family: var(--font-sans);
-		font-size: 0.95rem;
+		font-size: 0.85rem;
 		font-weight: 600;
 		color: var(--text-primary);
 		margin-bottom: 0.75rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-	}
-
-	.action-desc {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-		line-height: 1.4;
-		margin-bottom: 1.25rem;
-	}
-
-	.action-buttons {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	.btn-full {
-		width: 100%;
-		justify-content: center;
-		padding: 0.6rem 1rem;
-		font-size: 0.85rem;
-	}
-
-	.btn-icon {
-		margin-right: 8px;
-		flex-shrink: 0;
 	}
 
 	.architecture-card p {
@@ -384,5 +454,107 @@ const publications = [
 		font-size: 1.25rem;
 		line-height: 1;
 		font-weight: 700;
+	}
+
+	/* Action Buttons in Footer */
+	.post-footer-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-top: 2rem;
+		border-top: 1px solid var(--border-color);
+		padding-top: 1.5rem;
+	}
+
+	.btn-icon {
+		margin-right: 6px;
+		flex-shrink: 0;
+	}
+
+	/* Sticky Table of Contents Sidebar */
+	.research-sidebar {
+		display: none;
+	}
+
+	@media (min-width: 960px) {
+		.research-sidebar {
+			display: block;
+		}
+	}
+
+	.sidebar-sticky-box {
+		position: sticky;
+		top: 100px;
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	.sidebar-title {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		margin: 0;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 0.5rem;
+	}
+
+	.toc-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		border-left: 1px solid var(--border-color);
+	}
+
+	.toc-link {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		text-decoration: none;
+		padding: 0.4rem 0 0.4rem 0.85rem;
+		border-left: 2px solid transparent;
+		margin-left: -1px;
+		transition: all var(--transition-speed) ease;
+		line-height: 1.35;
+	}
+
+	.toc-link:hover {
+		color: var(--accent-color);
+		background: rgba(0, 68, 136, 0.015);
+	}
+
+	.toc-link.active {
+		color: var(--accent-color);
+		font-weight: 600;
+		border-left-color: var(--accent-color);
+		background: rgba(0, 68, 136, 0.03);
+	}
+
+	.sidebar-extra-info {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		padding: 1.25rem;
+	}
+
+	.sidebar-extra-info h4 {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-primary);
+		margin-bottom: 0.5rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.sidebar-extra-info p {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		line-height: 1.45;
+		margin: 0;
 	}
 </style>
