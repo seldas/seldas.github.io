@@ -3,72 +3,430 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const updates = await getCollection('updates');
-const sortedUpdates = updates.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Helper to get YYYY-MM-DD in UTC
+function getUTCDateString(date: Date) {
+	const y = date.getUTCFullYear();
+	const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+	const d = String(date.getUTCDate()).padStart(2, '0');
+	return `${y}-${m}-${d}`;
+}
+
+interface CalendarDay {
+	dayNumber: number | null;
+	dateStr: string | null;
+	isCurrentMonth: boolean;
+	updates: typeof updates;
+}
+
+interface MonthData {
+	name: string;
+	year: number;
+	monthIndex: number; // 0-indexed: 2 = March, 3 = April, 4 = May
+	days: CalendarDay[];
+	allUpdates: typeof updates;
+}
+
+function getMonthDays(year: number, monthIndex: number, updatesList: typeof updates): CalendarDay[] {
+	const days: CalendarDay[] = [];
+	
+	// Day of the week for the 1st of the month (0 = Sun, 1 = Mon, ..., 6 = Sat)
+	const firstDayOfWeek = new Date(year, monthIndex, 1).getDay();
+	
+	// Total days in the month
+	const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+	
+	// Padding days at start
+	for (let i = 0; i < firstDayOfWeek; i++) {
+		days.push({
+			dayNumber: null,
+			dateStr: null,
+			isCurrentMonth: false,
+			updates: []
+		});
+	}
+	
+	// Current month days
+	for (let day = 1; day <= totalDays; day++) {
+		const currentDateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+		const dayUpdates = updatesList.filter(update => {
+			return getUTCDateString(update.data.date) === currentDateStr;
+		});
+		
+		days.push({
+			dayNumber: day,
+			dateStr: currentDateStr,
+			isCurrentMonth: true,
+			updates: dayUpdates
+		});
+	}
+	
+	// Padding days at end to fill the grid (multiple of 7)
+	const totalCells = Math.ceil(days.length / 7) * 7;
+	const paddingEnd = totalCells - days.length;
+	for (let i = 0; i < paddingEnd; i++) {
+		days.push({
+			dayNumber: null,
+			dateStr: null,
+			isCurrentMonth: false,
+			updates: []
+		});
+	}
+	
+	return days;
+}
+
+// Get all updates for a specific month
+function getMonthUpdates(monthIndex: number, year: number, updatesList: typeof updates) {
+	return updatesList.filter(update => {
+		const d = update.data.date;
+		return d.getUTCFullYear() === year && d.getUTCMonth() === monthIndex;
+	}).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+}
+
+const calendarMonths: MonthData[] = [
+	{ 
+		name: "May", 
+		year: 2026, 
+		monthIndex: 4, 
+		days: getMonthDays(2026, 4, updates),
+		allUpdates: getMonthUpdates(4, 2026, updates)
+	},
+	{ 
+		name: "April", 
+		year: 2026, 
+		monthIndex: 3, 
+		days: getMonthDays(2026, 3, updates),
+		allUpdates: getMonthUpdates(3, 2026, updates)
+	},
+	{ 
+		name: "March", 
+		year: 2026, 
+		monthIndex: 2, 
+		days: getMonthDays(2026, 2, updates),
+		allUpdates: getMonthUpdates(2, 2026, updates)
+	}
+];
+
+const projectMeta: Record<string, { label: string; class: string; bg: string; color: string; border: string; dotColor: string }> = {
+	'askfdalabel': { label: 'AskFDALabel', class: 'proj-askfdalabel', bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe', dotColor: '#3b82f6' },
+	'askmyfaers': { label: 'AskMyFAERS', class: 'proj-askmyfaers', bg: '#f5f3ff', color: '#4f46e5', border: '#ddd6fe', dotColor: '#6366f1' },
+	'llm4ae': { label: 'LLM4AE', class: 'proj-llm4ae', bg: '#ecfdf5', color: '#047857', border: '#a7f3d0', dotColor: '#10b981' },
+	'ganomics': { label: 'GANomics', class: 'proj-ganomics', bg: '#fffbeb', color: '#b45309', border: '#fde68a', dotColor: '#f59e0b' },
+	'dbbtoolkits': { label: 'DBBToolkits', class: 'proj-dbbtoolkits', bg: '#fff1f2', color: '#e11d48', border: '#fecdd3', dotColor: '#f43f5e' },
+	'labelcomp': { label: 'LabelComp', class: 'proj-labelcomp', bg: '#f3f4f6', color: '#4b5563', border: '#e5e7eb', dotColor: '#9ca3af' },
+	'hetenc': { label: 'HetEnc', class: 'proj-hetenc', bg: '#f0fdfa', color: '#0d9488', border: '#ccfbf1', dotColor: '#14b8a6' }
+};
+
+function getProjectMeta(proj: string | undefined) {
+	const key = (proj || '').toLowerCase().trim();
+	return projectMeta[key] || { label: proj || 'Update', class: 'proj-generic', bg: '#f8fafc', color: '#475569', border: '#e2e8f0', dotColor: '#64748b' };
+}
+
+function formatLogDate(date: Date) {
+	return date.toLocaleDateString('en-US', {
+		weekday: 'long',
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC'
+	});
+}
 ---
 
-<Layout title="Updates Log | seldas Research" description="Chronological research updates, logs, and experiment notes for projects like LabelComp and HetEnc.">
-	<div class="container">
+<Layout title="Research Calendar | seldas Updates" description="Weekly chronological research activity and commit updates for FDA labeling and pharmacovigilance tools.">
+	<div class="container container-wide">
 		<header class="page-header">
-			<h1 class="page-title">Research Updates</h1>
-			<p class="page-subtitle">A chronological record of pipeline releases, model validations, and technical updates.</p>
+			<h1 class="page-title">Research Calendar</h1>
+			<p class="page-subtitle">A visual record of pipeline developments, experimental commits, and model releases across active repositories.</p>
 		</header>
 
-		<div class="timeline-container">
-			<div class="timeline-line"></div>
-			
-			<div class="timeline-items">
-				{sortedUpdates.map((update, index) => {
-					const dateStr = update.data.date.toLocaleDateString('en-US', {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric'
-					});
+		<!-- Project Legend -->
+		<div class="legend-container">
+			<span class="legend-title">Repository Key:</span>
+			<div class="legend-items">
+				{Object.entries(projectMeta).map(([key, meta]) => (
+					<div class="legend-item" key={key}>
+						<span class="legend-dot" style={`background-color: ${meta.dotColor};`}></span>
+						<span class="legend-label">{meta.label}</span>
+					</div>
+				))}
+			</div>
+		</div>
+
+		<!-- Interactive Controls Banner (Hidden by default, shown by JS) -->
+		<div id="filter-banner" class="filter-banner" style="display: none;">
+			<div class="filter-banner-content">
+				<span class="filter-banner-text">Showing updates for <strong id="filter-date-display"></strong>.</span>
+				<button id="clear-filter-global" class="btn btn-secondary btn-sm">Show All Updates</button>
+			</div>
+		</div>
+
+		<div class="calendar-months">
+			{calendarMonths.map((month) => (
+				<section class="calendar-month-section" id={`month-${month.name.toLowerCase()}`}>
+					<div class="month-header-row">
+						<h2 class="month-heading">{month.name} {month.year}</h2>
+						<button class="clear-month-filter-btn" data-month={month.name.toLowerCase()} style="display: none;">
+							Reset Month View
+						</button>
+					</div>
 					
-					return (
-						<div class="timeline-item">
-							<div class="timeline-dot-wrapper">
-								<div class="timeline-dot"></div>
-							</div>
-							
-							<div class="timeline-content-wrapper">
-								<div class="card timeline-card">
-									<div class="update-meta">
-										<time class="update-date">{dateStr}</time>
-										{update.data.project && (
-											<span class="badge badge-update">{update.data.project}</span>
+					<div class="calendar-card">
+						{/* Weekday headers */}
+						<div class="calendar-weekdays">
+							<div class="weekday-header">Sun</div>
+							<div class="weekday-header">Mon</div>
+							<div class="weekday-header">Tue</div>
+							<div class="weekday-header">Wed</div>
+							<div class="weekday-header">Thu</div>
+							<div class="weekday-header">Fri</div>
+							<div class="weekday-header">Sat</div>
+						</div>
+						
+						{/* Days grid */}
+						<div class="calendar-grid">
+							{month.days.map((cell) => {
+								const hasUpdates = cell.updates.length > 0;
+								return (
+									<div 
+										class={`calendar-cell ${cell.dayNumber === null ? 'cell-padding' : ''} ${hasUpdates ? 'cell-active' : ''}`}
+										data-date={cell.dateStr}
+										data-month={month.name.toLowerCase()}
+									>
+										{cell.dayNumber && (
+											<span class="cell-day-num">{cell.dayNumber}</span>
+										)}
+										
+										{hasUpdates && (
+											<div class="cell-updates">
+												{cell.updates.map((update) => {
+													const meta = getProjectMeta(update.data.project);
+													return (
+														<a 
+															href={`/updates/${update.id}`} 
+															class="cal-update-link" 
+															title={update.data.title}
+															style={`--proj-bg: ${meta.bg}; --proj-color: ${meta.color}; --proj-border: ${meta.border};`}
+															data-update-link-id={update.id}
+														>
+															<span class="cal-update-dot" style={`background-color: ${meta.dotColor};`}></span>
+															<span class="cal-update-text">{meta.label}</span>
+														</a>
+													);
+												})}
+											</div>
 										)}
 									</div>
-									<h2 class="update-title">
-										<a href={`/updates/${update.id}`}>{update.data.title}</a>
-									</h2>
-									{update.data.description ? (
-										<p class="update-description">{update.data.description}</p>
-									) : (
-										<p class="update-description">Click below to read the full technical logs and details of this research update...</p>
-									)}
-									<div class="update-footer">
-										<div class="update-tags">
-											{update.data.tags.map(tag => (
-												<span class="badge">{tag}</span>
-											))}
-										</div>
-										<a href={`/updates/${update.id}`} class="read-more-link">
-											Read Full Log →
-										</a>
-									</div>
-								</div>
-							</div>
+								);
+							})}
 						</div>
-					);
-				})}
-			</div>
+					</div>
+
+					{/* Chronological updates for this month */}
+					<div class="month-log-section">
+						<h3 class="month-log-title">{month.name} Activity Feed</h3>
+						<div class="month-log-list" data-month-list={month.name.toLowerCase()}>
+							{month.allUpdates.length > 0 ? (
+								month.allUpdates.map((update) => {
+									const meta = getProjectMeta(update.data.project);
+									return (
+										<article 
+											class="update-card" 
+											data-card-date={getUTCDateString(update.data.date)}
+											data-update-id={update.id}
+										>
+											<div class="update-card-header">
+												<time class="update-card-date">{formatLogDate(update.data.date)}</time>
+												{update.data.project && (
+													<span class="badge badge-update" style={`background-color: ${meta.bg}; color: ${meta.color}; border-color: ${meta.border};`}>
+														{meta.label}
+													</span>
+												)}
+											</div>
+											<h4 class="update-card-title">
+												<a href={`/updates/${update.id}`}>{update.data.title}</a>
+											</h4>
+											{update.data.description && (
+												<p class="update-card-desc">{update.data.description}</p>
+											)}
+											<div class="update-card-meta">
+												<div class="update-card-tags">
+													{update.data.tags.map(tag => (
+														<span class="tag-badge" key={tag}>#{tag}</span>
+													))}
+												</div>
+												<a href={`/updates/${update.id}`} class="read-more-link">
+													Read Technical Log &rarr;
+												</a>
+											</div>
+										</article>
+									);
+								})
+							) : (
+								<p class="no-activity">No releases or updates documented this month.</p>
+							)}
+						</div>
+					</div>
+				</section>
+			))}
 		</div>
 	</div>
 </Layout>
 
+<script>
+	// Interactive Calendar Filtering Script
+	document.addEventListener('DOMContentLoaded', () => {
+		const activeCells = document.querySelectorAll('.calendar-cell.cell-active');
+		const allCards = document.querySelectorAll('.update-card');
+		const clearMonthBtns = document.querySelectorAll('.clear-month-filter-btn');
+		
+		const filterBanner = document.getElementById('filter-banner');
+		const filterDateDisplay = document.getElementById('filter-date-display');
+		const clearFilterGlobal = document.getElementById('clear-filter-global');
+
+		// Handle calendar cell clicks
+		activeCells.forEach(cell => {
+			cell.addEventListener('click', (e) => {
+				// Don't filter if clicking directly on a link inside the cell
+				if (e.target && (e.target as HTMLElement).closest('.cal-update-link')) {
+					return;
+				}
+
+				const dateStr = cell.getAttribute('data-date');
+				const month = cell.getAttribute('data-month');
+				if (!dateStr || !month) return;
+
+				// Toggle selection
+				const isAlreadySelected = cell.classList.contains('cell-selected');
+				
+				// Deselect all active cells
+				document.querySelectorAll('.calendar-cell.cell-selected').forEach(c => {
+					c.classList.remove('cell-selected');
+				});
+
+				if (isAlreadySelected) {
+					// Reset filters for this month
+					resetMonthFilters(month);
+				} else {
+					// Select this cell
+					cell.classList.add('cell-selected');
+					
+					// Filter cards for this month
+					filterCardsByDate(dateStr, month);
+				}
+			});
+		});
+
+		// Clear button handlers
+		clearMonthBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				const month = btn.getAttribute('data-month');
+				if (month) resetMonthFilters(month);
+			});
+		});
+
+		clearFilterGlobal?.addEventListener('click', () => {
+			resetAllFilters();
+		});
+
+		function filterCardsByDate(dateStr: string, month: string) {
+			let matchCount = 0;
+			allCards.forEach(card => {
+				const cardDate = card.getAttribute('data-card-date');
+				const parentList = card.closest('[data-month-list]');
+				const cardMonth = parentList ? parentList.getAttribute('data-month-list') : null;
+
+				if (cardMonth === month) {
+					if (cardDate === dateStr) {
+						(card as HTMLElement).style.display = 'block';
+						card.classList.add('highlighted-card');
+						matchCount++;
+					} else {
+						(card as HTMLElement).style.display = 'none';
+						card.classList.remove('highlighted-card');
+					}
+				}
+			});
+
+			// Show Reset Button for this month
+			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
+			if (resetBtn) resetBtn.style.display = 'inline-block';
+
+			// Show global filter banner
+			if (filterBanner && filterDateDisplay) {
+				const parts = dateStr.split('-');
+				// Create date in UTC to avoid local timezone issues
+				const formatted = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))).toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					timeZone: 'UTC'
+				});
+				filterDateDisplay.textContent = formatted;
+				filterBanner.style.display = 'block';
+				filterBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+			}
+		}
+
+		function resetMonthFilters(month: string) {
+			// Remove selected styles from cells in this month
+			document.querySelectorAll(`.calendar-cell.cell-selected[data-month="${month}"]`).forEach(c => {
+				c.classList.remove('cell-selected');
+			});
+
+			// Show all cards in this month
+			allCards.forEach(card => {
+				const parentList = card.closest('[data-month-list]');
+				const cardMonth = parentList ? parentList.getAttribute('data-month-list') : null;
+				if (cardMonth === month) {
+					(card as HTMLElement).style.display = 'block';
+					card.classList.remove('highlighted-card');
+				}
+			});
+
+			// Hide reset button
+			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
+			if (resetBtn) resetBtn.style.display = 'none';
+
+			// Hide global banner if no other month is selected
+			const anySelected = document.querySelectorAll('.calendar-cell.cell-selected').length > 0;
+			if (!anySelected && filterBanner) {
+				filterBanner.style.display = 'none';
+			}
+		}
+
+		function resetAllFilters() {
+			document.querySelectorAll('.calendar-cell.cell-selected').forEach(c => {
+				c.classList.remove('cell-selected');
+			});
+
+			allCards.forEach(card => {
+				(card as HTMLElement).style.display = 'block';
+				card.classList.remove('highlighted-card');
+			});
+
+			clearMonthBtns.forEach(btn => {
+				(btn as HTMLElement).style.display = 'none';
+			});
+
+			if (filterBanner) {
+				filterBanner.style.display = 'none';
+			}
+		}
+	});
+</script>
+
 <style>
+	.container-wide {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+	}
+
 	.page-header {
-		margin-bottom: 3rem;
+		margin-bottom: 2rem;
 		border-bottom: 1px solid var(--border-color);
 		padding-bottom: 1.5rem;
 	}
@@ -77,6 +435,7 @@ const sortedUpdates = updates.sort((a, b) => b.data.date.getTime() - a.data.date
 		font-family: var(--font-sans);
 		margin-bottom: 0.5rem;
 		font-weight: 600;
+		color: var(--text-primary);
 	}
 	.page-subtitle {
 		font-size: 1.1rem;
@@ -84,134 +443,404 @@ const sortedUpdates = updates.sort((a, b) => b.data.date.getTime() - a.data.date
 		line-height: 1.5;
 	}
 
-	/* Timeline styles */
-	.timeline-container {
-		position: relative;
-		max-width: 720px;
-		padding-left: 2rem;
-	}
-
-	.timeline-line {
-		position: absolute;
-		left: 7px;
-		top: 12px;
-		bottom: 12px;
-		width: 1px;
-		background: var(--border-color);
-	}
-
-	.timeline-items {
+	/* Legend */
+	.legend-container {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		padding: 0.75rem 1.25rem;
+		margin-bottom: 2.5rem;
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 0.5rem;
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
 	}
-
-	.timeline-item {
+	@media (min-width: 640px) {
+		.legend-container {
+			flex-direction: row;
+			align-items: center;
+			gap: 1rem;
+		}
+	}
+	.legend-title {
+		font-weight: 600;
+		color: var(--text-secondary);
+		flex-shrink: 0;
+	}
+	.legend-items {
 		display: flex;
-		position: relative;
+		flex-wrap: wrap;
+		gap: 0.75rem 1.25rem;
 	}
-
-	.timeline-dot-wrapper {
-		position: absolute;
-		left: -2rem;
-		top: 28px;
+	.legend-item {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		width: 16px;
-		height: 16px;
-		transform: translateX(-50%);
+		gap: 0.35rem;
 	}
-
-	.timeline-dot {
+	.legend-dot {
 		width: 8px;
 		height: 8px;
-		background: #ffffff;
-		border: 1px solid var(--text-muted);
 		border-radius: 50%;
+	}
+	.legend-label {
+		color: var(--text-primary);
+		font-weight: 500;
+	}
+
+	/* Global Filter Banner */
+	.filter-banner {
+		background: #eff6ff;
+		border: 1px solid #bfdbfe;
+		border-radius: 4px;
+		padding: 0.75rem 1.25rem;
+		margin-bottom: 2rem;
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+	}
+	.filter-banner-content {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+	.filter-banner-text {
+		color: #1e3a8a;
+	}
+	.btn-sm {
+		padding: 0.25rem 0.75rem;
+		font-size: 0.8rem;
+	}
+
+	/* Calendar Month Layout */
+	.calendar-months {
+		display: flex;
+		flex-direction: column;
+		gap: 4rem;
+		margin-bottom: 5rem;
+	}
+
+	.calendar-month-section {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.month-header-row {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		border-bottom: 2px solid var(--text-primary);
+		padding-bottom: 0.5rem;
+	}
+
+	.month-heading {
+		font-family: var(--font-sans);
+		font-size: 1.5rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-primary);
+		margin: 0;
+	}
+
+	.clear-month-filter-btn {
+		background: none;
+		border: none;
+		color: var(--accent-color);
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+		text-decoration: underline;
+		padding: 0;
+	}
+	.clear-month-filter-btn:hover {
+		color: #002244;
+	}
+
+	/* Calendar Card (Wrapper to ensure neat border rounding) */
+	.calendar-card {
+		border: 1px solid var(--border-color);
+		border-radius: 6px;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
+		background: var(--bg-base);
+	}
+
+	/* Weekdays */
+	.calendar-weekdays {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		border-bottom: 1px solid var(--border-color);
+		background: #fdfdfd;
+		text-align: center;
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-secondary);
+	}
+	.weekday-header {
+		padding: 0.75rem 0.25rem;
+		border-right: 1px solid var(--border-color);
+	}
+	.weekday-header:last-child {
+		border-right: none;
+	}
+
+	/* Grid */
+	.calendar-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		background: var(--border-color);
+		gap: 1px;
+	}
+
+	/* Cell */
+	.calendar-cell {
+		background: var(--bg-base);
+		min-height: 110px;
+		padding: 0.6rem;
+		display: flex;
+		flex-direction: column;
+		position: relative;
 		transition: all var(--transition-speed) ease;
 	}
 
-	.timeline-item:hover .timeline-dot {
-		border-color: var(--accent-color);
-		background: var(--accent-color);
+	.cell-padding {
+		background: #fafafa;
+		background-image: repeating-linear-gradient(45deg, #f7f7f7 0, #f7f7f7 1px, transparent 0, transparent 50%);
+		background-size: 8px 8px;
+		opacity: 0.6;
 	}
 
-	.timeline-content-wrapper {
-		width: 100%;
+	.cell-active {
+		cursor: pointer;
+	}
+	.cell-active:hover {
+		background: #fafcfd;
 	}
 
-	.timeline-card {
-		padding: 1.25rem;
+	.cell-selected {
+		background: #f0f7ff !important;
+		box-shadow: inset 0 0 0 2px var(--accent-color);
+		z-index: 2;
 	}
 
-	.update-meta {
+	.cell-day-num {
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--text-muted);
+		align-self: flex-end;
+		margin-bottom: 0.5rem;
+		line-height: 1;
+	}
+	.cell-active .cell-day-num {
+		color: var(--text-primary);
+		font-weight: 700;
+	}
+
+	/* Cell Updates */
+	.cell-updates {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		flex-grow: 1;
+	}
+
+	.cal-update-link {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.35rem;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-decoration: none;
+		padding: 0.2rem 0.4rem;
+		border-radius: 3px;
+		background: var(--proj-bg);
+		color: var(--proj-color);
+		border: 1px solid var(--proj-border);
+		transition: all var(--transition-speed) ease;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.cal-update-link:hover {
+		filter: brightness(0.96);
+		transform: translateY(-0.5px);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	}
+
+	.cal-update-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+	.cal-update-text {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* Chronological Feed styling */
+	.month-log-section {
+		margin-top: 1.5rem;
+	}
+	.month-log-title {
+		font-family: var(--font-sans);
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--text-secondary);
+		margin-bottom: 1rem;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 0.35rem;
+	}
+	.month-log-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.update-card {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		padding: 1.25rem;
+		transition: all var(--transition-speed) ease;
+	}
+	.update-card:hover {
+		background: var(--bg-panel-hover);
+	}
+	.highlighted-card {
+		border-color: var(--accent-color);
+		background: #fdfdfd;
+		box-shadow: 0 2px 8px rgba(0, 68, 136, 0.05);
+	}
+
+	.update-card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 0.5rem;
 	}
-
-	.update-date {
+	.update-card-date {
 		font-family: var(--font-mono);
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		color: var(--text-muted);
 	}
-
-	.update-title {
-		font-size: 1.35rem;
+	.update-card-title {
 		font-family: var(--font-sans);
-		margin-bottom: 0.75rem;
+		font-size: 1.15rem;
+		font-weight: 600;
+		line-height: 1.3;
+		margin-bottom: 0.5rem;
 	}
-
-	.update-title a {
-		text-decoration: none;
+	.update-card-title a {
 		color: var(--text-primary);
+		text-decoration: none;
 	}
-
-	.update-title a:hover {
+	.update-card-title a:hover {
 		color: var(--accent-color);
 		text-decoration: underline;
 	}
-
-	.update-description {
+	.update-card-desc {
+		font-family: var(--font-serif);
+		font-size: 0.9rem;
 		color: var(--text-secondary);
-		font-size: 0.95rem;
-		line-height: 1.6;
-		margin-bottom: 1rem;
+		line-height: 1.5;
+		margin-bottom: 0.75rem;
 	}
-
-	.update-footer {
+	.update-card-meta {
 		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
+		align-items: center;
 		justify-content: space-between;
-		border-top: 1px solid var(--border-color);
-		padding-top: 0.75rem;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		font-size: 0.8rem;
 	}
-
-	@media (min-width: 640px) {
-		.update-footer {
-			flex-direction: row;
-			align-items: center;
-		}
-	}
-
-	.update-tags {
+	.update-card-tags {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.4rem;
 	}
-
+	.tag-badge {
+		font-family: var(--font-mono);
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
 	.read-more-link {
-		font-family: var(--font-sans);
-		font-size: 0.85rem;
-		font-weight: 500;
 		color: var(--accent-color);
+		font-family: var(--font-sans);
+		font-weight: 500;
 		text-decoration: none;
 	}
-
 	.read-more-link:hover {
 		text-decoration: underline;
+	}
+
+	.no-activity {
+		font-family: var(--font-serif);
+		font-style: italic;
+		color: var(--text-muted);
+		font-size: 0.9rem;
+		text-align: center;
+		padding: 2rem;
+		border: 1px dashed var(--border-color);
+		border-radius: 4px;
+	}
+
+	/* Responsive tweaks */
+	@media (max-width: 767px) {
+		.container-wide {
+			padding: 0 1rem;
+		}
+		
+		.calendar-cell {
+			min-height: 55px;
+			padding: 0.35rem;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.cell-day-num {
+			align-self: center;
+			margin-bottom: 0;
+			font-size: 0.75rem;
+		}
+
+		.cell-updates {
+			flex-direction: row;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 0.2rem;
+			width: 100%;
+			flex-grow: 0;
+			margin-top: 0.15rem;
+		}
+
+		.cal-update-link {
+			padding: 0;
+			border: none;
+			background: none !important;
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			min-width: 6px;
+		}
+
+		.cal-update-dot {
+			width: 6px;
+			height: 6px;
+			margin: 0;
+		}
+
+		.cal-update-text {
+			display: none;
+		}
 	}
 </style>
