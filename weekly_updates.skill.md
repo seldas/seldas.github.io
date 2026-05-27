@@ -43,5 +43,13 @@ The local repositories are located in `d:\Coding\`. By default, track the follow
    <Your AI-generated summary here>
    ```
 
+6. **Commit and Push**
+   After successfully generating the markdown files, run the following commands to commit and push the changes to GitHub:
+   ```powershell
+   git -C d:\Coding\LW-BLOG add src/content/updates/
+   git -C d:\Coding\LW-BLOG commit -m "Auto-generate weekly updates"
+   git -C d:\Coding\LW-BLOG push
+   ```
+
 ## Note on Bulk Generation
 If the start date is 3 months ago, you might need to generate up to 12 files per project. Process these systematically and create the files.
