@@ -162,16 +162,28 @@ function formatLogDate(date: Date) {
 			</div>
 		</div>
 
-		<div class="calendar-months">
-			{calendarMonths.map((month) => (
-				<section class="calendar-month-section" id={`month-${month.name.toLowerCase()}`}>
-					<div class="month-header-row">
-						<h2 class="month-heading">{month.name} {month.year}</h2>
-						<button class="clear-month-filter-btn" data-month={month.name.toLowerCase()} style="display: none;">
-							Reset Month View
-						</button>
-					</div>
-					
+		<!-- Calendar Slider Navigation Bar -->
+		<div class="calendar-nav-bar">
+			<button id="prev-month-btn" class="nav-arrow-btn" aria-label="Previous Month">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+			</button>
+			<div class="nav-month-display">
+				<span id="current-month-name">May 2026</span>
+			</div>
+			<button id="next-month-btn" class="nav-arrow-btn" aria-label="Next Month">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+			</button>
+		</div>
+
+		<!-- Animated Slider Container -->
+		<div class="calendar-slider-container">
+			{calendarMonths.map((month, index) => (
+				<section 
+					class={`month-slide ${index === 0 ? 'slide-active' : 'slide-inactive slide-right'}`} 
+					id={`month-${month.name.toLowerCase()}`}
+					data-slide-index={index}
+					data-month-label={`${month.name} ${month.year}`}
+				>
 					<div class="calendar-card">
 						{/* Weekday headers */}
 						<div class="calendar-weekdays">
@@ -193,6 +205,7 @@ function formatLogDate(date: Date) {
 										class={`calendar-cell ${cell.dayNumber === null ? 'cell-padding' : ''} ${hasUpdates ? 'cell-active' : ''}`}
 										data-date={cell.dateStr}
 										data-month={month.name.toLowerCase()}
+										key={cell.dateStr || `padding-${Math.random()}`}
 									>
 										{cell.dayNumber && (
 											<span class="cell-day-num">{cell.dayNumber}</span>
@@ -209,6 +222,7 @@ function formatLogDate(date: Date) {
 															title={update.data.title}
 															style={`--proj-bg: ${meta.bg}; --proj-color: ${meta.color}; --proj-border: ${meta.border};`}
 															data-update-link-id={update.id}
+															key={update.id}
 														>
 															<span class="cal-update-dot" style={`background-color: ${meta.dotColor};`}></span>
 															<span class="cal-update-text">{meta.label}</span>
@@ -225,7 +239,12 @@ function formatLogDate(date: Date) {
 
 					{/* Chronological updates for this month */}
 					<div class="month-log-section">
-						<h3 class="month-log-title">{month.name} Activity Feed</h3>
+						<div class="month-log-header">
+							<h3 class="month-log-title">{month.name} Activity Feed</h3>
+							<button class="clear-month-filter-btn" data-month={month.name.toLowerCase()} style="display: none;">
+								Reset Filter
+							</button>
+						</div>
 						<div class="month-log-list" data-month-list={month.name.toLowerCase()}>
 							{month.allUpdates.length > 0 ? (
 								month.allUpdates.map((update) => {
@@ -235,6 +254,7 @@ function formatLogDate(date: Date) {
 											class="update-card" 
 											data-card-date={getUTCDateString(update.data.date)}
 											data-update-id={update.id}
+											key={update.id}
 										>
 											<div class="update-card-header">
 												<time class="update-card-date">{formatLogDate(update.data.date)}</time>
@@ -275,8 +295,63 @@ function formatLogDate(date: Date) {
 </Layout>
 
 <script>
-	// Interactive Calendar Filtering Script
+	// Interactive Calendar & Month Slider Script
 	document.addEventListener('DOMContentLoaded', () => {
+		const slides = document.querySelectorAll('.month-slide');
+		const prevBtn = document.getElementById('prev-month-btn');
+		const nextBtn = document.getElementById('next-month-btn');
+		const currentMonthDisplay = document.getElementById('current-month-name');
+
+		let currentSlideIndex = 0;
+		const totalSlides = slides.length;
+
+		function updateSlider(index: number) {
+			currentSlideIndex = index;
+
+			slides.forEach((slide, i) => {
+				slide.classList.remove('slide-active', 'slide-inactive', 'slide-left', 'slide-right');
+				if (i === index) {
+					slide.classList.add('slide-active');
+					// Update display text
+					if (currentMonthDisplay) {
+						currentMonthDisplay.textContent = slide.getAttribute('data-month-label') || '';
+					}
+				} else if (i < index) {
+					slide.classList.add('slide-inactive', 'slide-left');
+				} else {
+					slide.classList.add('slide-inactive', 'slide-right');
+				}
+			});
+
+			// Disable buttons at boundaries
+			// Remember: index 0 = May (latest), index 1 = Apr, index 2 = Mar
+			// Clicking "<" (Prev) should move chronologically back: from 0 -> 1 -> 2
+			// Clicking ">" (Next) should move chronologically forward: from 2 -> 1 -> 0
+			if (prevBtn) {
+				(prevBtn as HTMLButtonElement).disabled = index === totalSlides - 1;
+			}
+			if (nextBtn) {
+				(nextBtn as HTMLButtonElement).disabled = index === 0;
+			}
+		}
+
+		// Wire up slider arrows
+		prevBtn?.addEventListener('click', () => {
+			if (currentSlideIndex < totalSlides - 1) {
+				updateSlider(currentSlideIndex + 1);
+			}
+		});
+
+		nextBtn?.addEventListener('click', () => {
+			if (currentSlideIndex > 0) {
+				updateSlider(currentSlideIndex - 1);
+			}
+		});
+
+		// Initialize slider state
+		updateSlider(0);
+
+		// Calendar Cell Click Filtering
 		const activeCells = document.querySelectorAll('.calendar-cell.cell-active');
 		const allCards = document.querySelectorAll('.update-card');
 		const clearMonthBtns = document.querySelectorAll('.clear-month-filter-btn');
@@ -285,10 +360,8 @@ function formatLogDate(date: Date) {
 		const filterDateDisplay = document.getElementById('filter-date-display');
 		const clearFilterGlobal = document.getElementById('clear-filter-global');
 
-		// Handle calendar cell clicks
 		activeCells.forEach(cell => {
 			cell.addEventListener('click', (e) => {
-				// Don't filter if clicking directly on a link inside the cell
 				if (e.target && (e.target as HTMLElement).closest('.cal-update-link')) {
 					return;
 				}
@@ -297,28 +370,22 @@ function formatLogDate(date: Date) {
 				const month = cell.getAttribute('data-month');
 				if (!dateStr || !month) return;
 
-				// Toggle selection
 				const isAlreadySelected = cell.classList.contains('cell-selected');
 				
-				// Deselect all active cells
-				document.querySelectorAll('.calendar-cell.cell-selected').forEach(c => {
+				// Deselect active cells inside this month only
+				document.querySelectorAll(`.calendar-cell.cell-selected[data-month="${month}"]`).forEach(c => {
 					c.classList.remove('cell-selected');
 				});
 
 				if (isAlreadySelected) {
-					// Reset filters for this month
 					resetMonthFilters(month);
 				} else {
-					// Select this cell
 					cell.classList.add('cell-selected');
-					
-					// Filter cards for this month
 					filterCardsByDate(dateStr, month);
 				}
 			});
 		});
 
-		// Clear button handlers
 		clearMonthBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
 				const month = btn.getAttribute('data-month');
@@ -331,7 +398,6 @@ function formatLogDate(date: Date) {
 		});
 
 		function filterCardsByDate(dateStr: string, month: string) {
-			let matchCount = 0;
 			allCards.forEach(card => {
 				const cardDate = card.getAttribute('data-card-date');
 				const parentList = card.closest('[data-month-list]');
@@ -341,7 +407,6 @@ function formatLogDate(date: Date) {
 					if (cardDate === dateStr) {
 						(card as HTMLElement).style.display = 'block';
 						card.classList.add('highlighted-card');
-						matchCount++;
 					} else {
 						(card as HTMLElement).style.display = 'none';
 						card.classList.remove('highlighted-card');
@@ -349,14 +414,11 @@ function formatLogDate(date: Date) {
 				}
 			});
 
-			// Show Reset Button for this month
 			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
 			if (resetBtn) resetBtn.style.display = 'inline-block';
 
-			// Show global filter banner
 			if (filterBanner && filterDateDisplay) {
 				const parts = dateStr.split('-');
-				// Create date in UTC to avoid local timezone issues
 				const formatted = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))).toLocaleDateString('en-US', {
 					weekday: 'long',
 					year: 'numeric',
@@ -366,17 +428,14 @@ function formatLogDate(date: Date) {
 				});
 				filterDateDisplay.textContent = formatted;
 				filterBanner.style.display = 'block';
-				filterBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 			}
 		}
 
 		function resetMonthFilters(month: string) {
-			// Remove selected styles from cells in this month
 			document.querySelectorAll(`.calendar-cell.cell-selected[data-month="${month}"]`).forEach(c => {
 				c.classList.remove('cell-selected');
 			});
 
-			// Show all cards in this month
 			allCards.forEach(card => {
 				const parentList = card.closest('[data-month-list]');
 				const cardMonth = parentList ? parentList.getAttribute('data-month-list') : null;
@@ -386,11 +445,9 @@ function formatLogDate(date: Date) {
 				}
 			});
 
-			// Hide reset button
 			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
 			if (resetBtn) resetBtn.style.display = 'none';
 
-			// Hide global banner if no other month is selected
 			const anySelected = document.querySelectorAll('.calendar-cell.cell-selected').length > 0;
 			if (!anySelected && filterBanner) {
 				filterBanner.style.display = 'none';
@@ -513,54 +570,98 @@ function formatLogDate(date: Date) {
 		font-size: 0.8rem;
 	}
 
-	/* Calendar Month Layout */
-	.calendar-months {
+	/* Navigation Bar for Slider */
+	.calendar-nav-bar {
 		display: flex;
-		flex-direction: column;
-		gap: 4rem;
-		margin-bottom: 5rem;
-	}
-
-	.calendar-month-section {
-		display: flex;
-		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 		gap: 1.5rem;
-	}
-
-	.month-header-row {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		border-bottom: 2px solid var(--text-primary);
-		padding-bottom: 0.5rem;
-	}
-
-	.month-heading {
+		margin-bottom: 2.5rem;
 		font-family: var(--font-sans);
-		font-size: 1.5rem;
+	}
+
+	.nav-arrow-btn {
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		color: var(--text-primary);
+		width: 38px;
+		height: 38px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all var(--transition-speed) ease;
+		outline: none;
+	}
+
+	.nav-arrow-btn:hover:not(:disabled) {
+		border-color: var(--accent-color);
+		color: var(--accent-color);
+		background: #f8fafc;
+		transform: scale(1.05);
+	}
+
+	.nav-arrow-btn:disabled {
+		opacity: 0.25;
+		cursor: not-allowed;
+		background: var(--bg-panel);
+	}
+
+	.nav-month-display {
+		min-width: 160px;
+		text-align: center;
+	}
+
+	#current-month-name {
+		font-size: 1.25rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		color: var(--text-primary);
-		margin: 0;
 	}
 
-	.clear-month-filter-btn {
-		background: none;
-		border: none;
-		color: var(--accent-color);
-		font-family: var(--font-sans);
-		font-size: 0.85rem;
-		font-weight: 600;
-		cursor: pointer;
-		text-decoration: underline;
-		padding: 0;
-	}
-	.clear-month-filter-btn:hover {
-		color: #002244;
+	/* Calendar Slider Container */
+	.calendar-slider-container {
+		position: relative;
+		width: 100%;
 	}
 
-	/* Calendar Card (Wrapper to ensure neat border rounding) */
+	/* Month Slide Panel */
+	.month-slide {
+		width: 100%;
+		transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, visibility 0.5s ease;
+	}
+
+	/* Inactive Slides absolute positioning */
+	.month-slide.slide-inactive {
+		position: absolute;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	/* Parallax-like transition directions */
+	.month-slide.slide-left {
+		transform: translateX(-100px);
+	}
+
+	.month-slide.slide-right {
+		transform: translateX(100px);
+	}
+
+	/* Active Slide relative positioning */
+	.month-slide.slide-active {
+		position: relative;
+		opacity: 1;
+		visibility: visible;
+		transform: translateX(0);
+		z-index: 2;
+	}
+
+	/* Calendar Card */
 	.calendar-card {
 		border: 1px solid var(--border-color);
 		border-radius: 6px;
@@ -689,17 +790,41 @@ function formatLogDate(date: Date) {
 
 	/* Chronological Feed styling */
 	.month-log-section {
-		margin-top: 1.5rem;
+		margin-top: 2rem;
 	}
+	
+	.month-log-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 0.5rem;
+		margin-bottom: 1.25rem;
+	}
+	
 	.month-log-title {
 		font-family: var(--font-sans);
-		font-size: 1.1rem;
+		font-size: 1.15rem;
 		font-weight: 600;
 		color: var(--text-secondary);
-		margin-bottom: 1rem;
-		border-bottom: 1px solid var(--border-color);
-		padding-bottom: 0.35rem;
+		margin: 0;
 	}
+
+	.clear-month-filter-btn {
+		background: none;
+		border: none;
+		color: var(--accent-color);
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+		text-decoration: underline;
+		padding: 0;
+	}
+	.clear-month-filter-btn:hover {
+		color: #002244;
+	}
+
 	.month-log-list {
 		display: flex;
 		flex-direction: column;
