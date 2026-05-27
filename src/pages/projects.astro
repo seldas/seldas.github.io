@@ -3,7 +3,32 @@ import Layout from '../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 
 const projects = await getCollection('projects');
-const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+const updates = await getCollection('updates');
+
+// Map project id to its latest update time
+const projectLatestUpdateMap: Record<string, number> = {};
+for (const update of updates) {
+	const projId = (update.data.project || '').toLowerCase().trim();
+	const updateTime = new Date(update.data.date).getTime();
+	if (!projectLatestUpdateMap[projId] || updateTime > projectLatestUpdateMap[projId]) {
+		projectLatestUpdateMap[projId] = updateTime;
+	}
+}
+
+// Sort projects: recently updated first, fallback to original order
+const sortedProjects = projects.sort((a, b) => {
+	const aKey = a.id.toLowerCase().replace(/\.md$/, '').trim();
+	const bKey = b.id.toLowerCase().replace(/\.md$/, '').trim();
+	
+	const aTime = projectLatestUpdateMap[aKey] || 0;
+	const bTime = projectLatestUpdateMap[bKey] || 0;
+	
+	if (aTime !== bTime) {
+		return bTime - aTime; // Latest update first
+	}
+	
+	return (a.data.order || 0) - (b.data.order || 0);
+});
 
 const projectsWithContent = await Promise.all(
 	sortedProjects.map(async (project) => {
@@ -11,6 +36,29 @@ const projectsWithContent = await Promise.all(
 		return { project, Content };
 	})
 );
+
+// Map of custom SVG icons for projects
+function getProjectIcon(id: string) {
+	const key = id.toLowerCase().replace(/\.md$/, '').trim();
+	switch(key) {
+		case 'askfdalabel':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+		case 'askmyfaers':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>`;
+		case 'llm4ae':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
+		case 'ganomics':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M4.5 16.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path><path d="M9.5 11.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path><path d="M5.5 12.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path><path d="M11.5 9.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path><path d="M8.5 7.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path><path d="M14.5 4.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2c1.26-1.5 3.5-2 3.5-2s-2.24.5-3.5 2z"></path></svg>`;
+		case 'dbbtoolkits':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`;
+		case 'labelcomp':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 18h6"></path><path d="M12 10h3"></path></svg>`;
+		case 'hetenc':
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+		default:
+			return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="proj-icon-svg"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+	}
+}
 ---
 
 <Layout title="Projects | seldas Research" description="Research projects and software tools shared by seldas on GitHub, including LabelComp and HetEnc.">
@@ -21,43 +69,84 @@ const projectsWithContent = await Promise.all(
 		</header>
 
 		<div class="projects-list">
-			{projectsWithContent.map(({ project, Content }) => (
-				<article class="project-detail-card">
-					<div class="project-meta-side">
-						<div class="meta-item">
-							<span class="meta-label">Status</span>
-							<span class={`badge ${project.data.status === 'Active' ? 'badge-active' : ''}`}>{project.data.status}</span>
-						</div>
-						<div class="meta-item">
-							<span class="meta-label">Source Code</span>
-							<a href={project.data.github} target="_blank" rel="noopener noreferrer" class="github-link-btn">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-								Repository
-							</a>
-						</div>
-						<div class="meta-item">
-							<span class="meta-label">Technologies</span>
-							<div class="tech-tags">
-								{project.data.tags.map(tag => (
-									<span class="badge">{tag}</span>
-								))}
+			{projectsWithContent.map(({ project, Content }, index) => {
+				const isDefaultExpanded = index === 0; // Expand the first (most recently updated) project by default
+				return (
+					<article 
+						class={`project-detail-card ${isDefaultExpanded ? 'expanded' : 'collapsed'}`} 
+						data-project-id={project.id}
+						key={project.id}
+					>
+						<div class="project-meta-side">
+							<div class="meta-item">
+								<span class="meta-label">Status</span>
+								<span class={`badge ${project.data.status === 'Active' ? 'badge-active' : ''}`}>{project.data.status}</span>
+							</div>
+							<div class="meta-item">
+								<span class="meta-label">Source Code</span>
+								<a href={project.data.github} target="_blank" rel="noopener noreferrer" class="github-link-btn">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+									Repository
+								</a>
+							</div>
+							<div class="meta-item">
+								<span class="meta-label">Technologies</span>
+								<div class="tech-tags">
+									{project.data.tags.map(tag => (
+										<span class="badge" key={tag}>{tag}</span>
+									))}
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="project-content-side">
-						<h2 class="project-title">{project.data.title}</h2>
-						<p class="project-brief-desc">{project.data.description}</p>
-						<hr class="divider"/>
-						<div class="markdown-body">
-							<Content />
+						<div class="project-content-side">
+							<div class="project-header-toggle">
+								<h2 class="project-title">
+									<span class="project-icon-inline" set:html={getProjectIcon(project.id)}></span>
+									{project.data.title}
+								</h2>
+								<span class="expand-indicator">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+								</span>
+							</div>
+							<p class="project-brief-desc">{project.data.description}</p>
+							
+							<div class="expandable-content">
+								<hr class="divider"/>
+								<div class="markdown-body">
+									<Content />
+								</div>
+							</div>
 						</div>
-					</div>
-				</article>
-			))}
+					</article>
+				);
+			})}
 		</div>
 	</div>
 </Layout>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const headerToggles = document.querySelectorAll('.project-header-toggle');
+		
+		headerToggles.forEach(toggle => {
+			toggle.addEventListener('click', () => {
+				const card = toggle.closest('.project-detail-card');
+				if (!card) return;
+				
+				const isExpanded = card.classList.contains('expanded');
+				
+				if (isExpanded) {
+					card.classList.remove('expanded');
+					card.classList.add('collapsed');
+				} else {
+					card.classList.remove('collapsed');
+					card.classList.add('expanded');
+				}
+			});
+		});
+	});
+</script>
 
 <style>
 	.page-header {
@@ -91,6 +180,7 @@ const projectsWithContent = await Promise.all(
 		display: grid;
 		grid-template-columns: 1fr;
 		overflow: hidden;
+		transition: all var(--transition-speed) ease;
 	}
 
 	@media (min-width: 768px) {
@@ -159,16 +249,73 @@ const projectsWithContent = await Promise.all(
 		flex-direction: column;
 	}
 
+	.project-header-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		cursor: pointer;
+		user-select: none;
+		margin-bottom: 0.5rem;
+	}
+
 	.project-title {
 		font-size: 1.5rem;
 		font-family: var(--font-sans);
-		margin-bottom: 0.5rem;
+		margin: 0;
+		display: flex;
+		align-items: center;
+	}
+
+	.project-icon-inline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--accent-color);
+		margin-right: 0.65rem;
+		vertical-align: middle;
+		transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	}
+
+	.project-header-toggle:hover .project-icon-inline {
+		transform: scale(1.2);
+	}
+
+	/* SVG icon style */
+	.proj-icon-svg {
+		stroke: var(--accent-color);
+		stroke-width: 2.25;
+		display: inline-block;
+		vertical-align: middle;
+		width: 20px;
+		height: 20px;
+	}
+
+	.expand-indicator {
+		color: var(--text-muted);
+		transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), color var(--transition-speed);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		border: 1px solid transparent;
+	}
+
+	.project-header-toggle:hover .expand-indicator {
+		color: var(--accent-color);
+		border-color: var(--border-color);
+		background: #f8fafc;
 	}
 
 	.project-brief-desc {
 		color: var(--text-secondary);
 		font-size: 1rem;
 		line-height: 1.5;
+		margin-bottom: 0;
+	}
+	
+	.project-detail-card.expanded .project-brief-desc {
 		margin-bottom: 1rem;
 	}
 
@@ -176,6 +323,29 @@ const projectsWithContent = await Promise.all(
 		border: none;
 		border-top: 1px solid var(--border-color);
 		margin-bottom: 1rem;
+	}
+
+	/* Collapsed/Expanded layout handling */
+	.expandable-content {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease;
+		opacity: 0;
+	}
+
+	.project-detail-card.expanded .expandable-content {
+		max-height: 2500px;
+		opacity: 1;
+	}
+
+	.project-detail-card.expanded .expand-indicator {
+		transform: rotate(180deg);
+		color: var(--accent-color);
+	}
+
+	.project-detail-card.expanded {
+		border-color: var(--accent-color);
+		box-shadow: 0 4px 16px rgba(0, 68, 136, 0.03);
 	}
 
 	/* Inner markdown rendering style */
