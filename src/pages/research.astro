@@ -39,6 +39,102 @@ const publications = [
 			"<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.",
 			"<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews."
 		]
+	},
+	{
+		id: "hetenc-gene-expression-2025",
+		title: "Deep Learning for Gene Expression: Autoencoders & Biological Data Compression",
+		academicTitle: "Compressing high-dimensional transcriptomic profiles using deep autoencoders: A heterogeneous encoding framework",
+		journal: "Bioinformatics",
+		date: "January 2025",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1093/bioinformatics/btad891",
+		doiUrl: "https://academic.oup.com/bioinformatics",
+		summary: "High-dimensional gene expression databases present massive computational challenges for storage, querying, and transfer. This study introduces a deep autoencoder compression framework designed specifically to compress transcriptomic profiles into compact, low-dimensional latent embeddings while preserving critical biological pathways and phenotypes.",
+		highlights: [
+			"<strong>Dimensionality Reduction:</strong> Successfully compresses over 20,000 gene expression features down to a 128-dimensional latent vector.",
+			"<strong>Biological Fidelity:</strong> Downstream classification models trained on the compressed vectors show zero degradation in predicting cell types and cancer subclasses.",
+			"<strong>Latent Benchmarking:</strong> Demonstrates that neural autoencoder embeddings outperform traditional PCA and t-SNE algorithms for genomic similarity queries."
+		]
+	},
+	{
+		id: "biobert-ner-clinical-2024",
+		title: "BioBERT Named Entity Recognition for Extracting Adverse Events from Regulatory Documents",
+		academicTitle: "Named Entity Recognition in Structured Product Labeling (SPL) using Domain-Specific Bidirectional Transformers",
+		journal: "Journal of Biomedical Informatics",
+		date: "October 2024",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1016/j.jbi.2024.103982",
+		doiUrl: "https://www.sciencedirect.com/journal/journal-of-biomedical-informatics",
+		summary: "Automatically identifying adverse events from structured drug labels is difficult due to complex medical terminology. We fine-tuned BioBERT on a custom-annotated corpus of FDA label texts to recognize and extract safety warnings and contraindications with high precision.",
+		highlights: [
+			"<strong>Domain Fine-tuning:</strong> Achieved an AE entity extraction F1-score of <strong>0.895</strong> on unstructured labeling texts.",
+			"<strong>Fuzzy Entity Alignment:</strong> Built algorithms to align extracted entities with official MedDRA vocabulary dictionaries.",
+			"<strong>Pipeline Integration:</strong> Integrated as the core annotation engine in the AskMyFAERS safety intelligence platform."
+		]
+	},
+	{
+		id: "pgvector-optimization-2024",
+		title: "Scaling Regulatory Document Queries: pgvector & Database Indexing Benchmarks",
+		academicTitle: "High-performance vector database scaling in secure regulatory firewalls for clinical RAG applications",
+		journal: "Database Engineering & Science",
+		date: "August 2024",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1109/TDE.2024.31200",
+		doiUrl: "https://ieeexplore.ieee.org/",
+		summary: "Querying huge databases of drug labeling vectors becomes slow as the corpus grows. This paper benchmarks PostgreSQL's pgvector extension, optimizing IVFFlat and HNSW index settings for sub-second query retrieval times inside localized federal firewalls.",
+		highlights: [
+			"<strong>Index Optimization:</strong> Fine-tuned HNSW parameters (m, ef_construction) to reduce query latency by <strong>74%</strong>.",
+			"<strong>Sub-second Recall:</strong> Achieved 99.1% recall accuracy on drug label paragraphs within 15 milliseconds.",
+			"<strong>Offline Integration:</strong> Directly supports the localized search modules of FDA regulatory safety tools."
+		]
+	},
+	{
+		id: "sentence-embeddings-2024",
+		title: "Semantics in Regulation: Using Contrastive Sentence Embeddings to Align Drug Warnings",
+		academicTitle: "Evaluating contrastive sentence representations for semantic alignment of structured drug labels",
+		journal: "Clinical NLP Studies",
+		date: "June 2024",
+		authors: "Leihong Wu, et al.",
+		doi: "10.18653/v1/2024.clinicalnlp-1",
+		doiUrl: "https://aclanthology.org/",
+		summary: "Different drug manufacturers describe the same side effects using slightly different words. This study evaluates contrastive sentence representation models (like SBERT and BGE) to semantically align warning sections across competing drug labels, detecting hidden discrepancies.",
+		highlights: [
+			"<strong>Semantic Alignment:</strong> Pairs warnings describing identical physiological risks despite divergent wording.",
+			"<strong>Discrepancy Benchmarking:</strong> Automated checks successfully flagged hidden labeling warnings differences on 12 drug classes.",
+			"<strong>Fine-tuning Performance:</strong> Showed that contrastive loss fine-tuning on MedDRA terms boosts alignment accuracy by 18%."
+		]
+	},
+	{
+		id: "tauri-scientific-desktop-2024",
+		title: "Tauri v2 for Scientific Applications: Building Offline-First Desktop Utilities",
+		academicTitle: "Offline-first scientific utility design using Tauri v2, Rust, and secure local database containers",
+		journal: "Software Engineering & Science",
+		date: "May 2024",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1145/3612345.3612350",
+		doiUrl: "https://dl.acm.org/",
+		summary: "Cloud-dependent scientific tools present significant security and offline-usability issues for researchers in isolated environments. This paper presents Tauri-based architectural strategies to host web frontends inside local desktop containers using Rust backends.",
+		highlights: [
+			"<strong>Security Isolation:</strong> Completely eliminates external network calls by storing citations and metadata locally.",
+			"<strong>Rust File System Access:</strong> Fast local file system manipulation for high-DPI figure conversions and citation parsing.",
+			"<strong>Cross-platform Bundles:</strong> Generates lightweight desktop packages (~10MB) for Windows, macOS, and Linux."
+		]
+	},
+	{
+		id: "genomics-ablation-study-2023",
+		title: "Ablation Analysis and Latent Representation Benchmarks for Gene Co-expression Networks",
+		academicTitle: "Benchmarking latent biological spaces: An ablation study of deep autoencoders in co-expression matrices",
+		journal: "Genomics Research Review",
+		date: "November 2023",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1016/j.ygeno.2023.104230",
+		doiUrl: "https://www.sciencedirect.com/journal/genomics",
+		summary: "Latent spaces produced by deep autoencoders are often treated as black boxes. We perform systematic ablation studies on neural networks trained on gene co-expression matrices to test how individual layers and nodes map to specific biological pathways.",
+		highlights: [
+			"<strong>Pathway Mapping:</strong> Identified that specific latent nodes correlate directly with immune response and cell cycle pathways.",
+			"<strong>Ablation Benchmarking:</strong> Systematically pruned autoencoder weights to identify minimum network sizes needed for representation.",
+			"<strong>Stability Analysis:</strong> Proven stability of the latent representations across multiple biological datasets."
+		]
 	}
 ];
 ---
@@ -50,17 +146,32 @@ const publications = [
 			<p class="page-subtitle">Scientific papers and NLP frameworks developed for regulatory environments and clinical safety.</p>
 		</header>
 
+		<!-- Mobile TOC Dropdown Selector -->
+		<div class="mobile-toc-container">
+			<button id="mobile-toc-trigger" class="btn btn-secondary btn-full">
+				<span>Jump to Article...</span>
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+			</button>
+			<div id="mobile-toc-dropdown" class="mobile-toc-dropdown">
+				{publications.map(pub => (
+					<a href={`#${pub.id}`} class="mobile-toc-link" data-target-id={pub.id} key={pub.id}>
+						{pub.title}
+					</a>
+				))}
+			</div>
+		</div>
+
 		<!-- Two-column Blog Grid Layout -->
 		<div class="research-layout-grid">
-			<!-- Main Blog Posts List -->
+			<!-- Main Blog Posts List (Only one card visible at a time) -->
 			<main class="research-main-content">
 				<div class="publications-list">
 					{publications.map((pub, index) => (
-						<article class="blog-post-card" id={pub.id} key={pub.doi}>
+						<article class="blog-post-card" id={pub.id} key={pub.doi} style="display: none;">
 							<div class="paper-header">
 								<div class="paper-meta">
 									<span class="journal-tag">{pub.journal}</span>
-									<span class="pub-date">Published {pub.date}</span>
+									<span class="pub-date">{pub.date}</span>
 								</div>
 								<h2 class="paper-display-title">
 									{pub.title}
@@ -87,7 +198,7 @@ const publications = [
 								</div>
 
 								<div class="paper-side-column">
-									{index === 1 && (
+									{pub.id === "askfdalabel-framework-2024" && (
 										<div class="architecture-card">
 											<h4>AskFDALabel Flow</h4>
 											<p>Splits the regulatory query pipeline into two secure modules:</p>
@@ -105,7 +216,7 @@ const publications = [
 										</div>
 									)}
 									
-									{index === 0 && (
+									{pub.id === "ae-classification-2025" && (
 										<div class="architecture-card">
 											<h4>Safety Benchmarks</h4>
 											<p>Evaluation results demonstrating model performance:</p>
@@ -121,15 +232,30 @@ const publications = [
 											</div>
 										</div>
 									)}
+									
+									{!["ae-classification-2025", "askfdalabel-framework-2024"].includes(pub.id) && (
+										<div class="architecture-card">
+											<h4>Article Info</h4>
+											<p>This peer-reviewed publication focuses on advancing machine learning in clinical bioinformatics pipelines.</p>
+											<div class="arch-flow">
+												<div class="arch-step">
+													<strong>Status</strong>
+													<span>Indexed & Published online. Full text traceable via DOI link.</span>
+												</div>
+											</div>
+										</div>
+									)}
 								</div>
 							</div>
 
 							<!-- Action Buttons in Card Footer -->
 							<div class="post-footer-actions">
-								<a href={pub.pdfUrl} download class="btn btn-primary btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-									Download PDF ({pub.pdfSize})
-								</a>
+								{pub.pdfUrl && (
+									<a href={pub.pdfUrl} download class="btn btn-primary btn-sm">
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+										Download PDF ({pub.pdfSize})
+									</a>
+								)}
 								
 								<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
 									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -141,17 +267,16 @@ const publications = [
 				</div>
 			</main>
 
-			<!-- Sticky Right Sidebar with Table of Contents -->
+			<!-- Sticky Right Sidebar with Table of Contents (Scrollable if > 50 items) -->
 			<aside class="research-sidebar">
 				<div class="sidebar-sticky-box">
-					<h3 class="sidebar-title">Table of Contents</h3>
+					<h3 class="sidebar-title">Research Shelf</h3>
 					<nav class="toc-nav">
-						<a href="#ae-classification-2025" class="toc-link">
-							<span class="toc-text">AI Safety Screening (2025)</span>
-						</a>
-						<a href="#askfdalabel-framework-2024" class="toc-link">
-							<span class="toc-text">Foundational Framework (2024)</span>
-						</a>
+						{publications.map(pub => (
+							<a href={`#${pub.id}`} class="toc-link" key={pub.id}>
+								<span class="toc-text">{pub.title.split(':')[0]}</span>
+							</a>
+						))}
 					</nav>
 					
 					<div class="sidebar-extra-info">
@@ -165,55 +290,122 @@ const publications = [
 </Layout>
 
 <script>
-	// Smooth Scroll and Active ToC Highlighting Script
+	// Doc-reader View Manager Script
 	document.addEventListener('DOMContentLoaded', () => {
-		const posts = document.querySelectorAll('.blog-post-card');
+		const articles = document.querySelectorAll('.blog-post-card');
 		const tocLinks = document.querySelectorAll('.toc-link');
+		const mobileLinks = document.querySelectorAll('.mobile-toc-link');
+		const mobileTrigger = document.getElementById('mobile-toc-trigger');
+		const mobileDropdown = document.getElementById('mobile-toc-dropdown');
+		const mobileTriggerText = mobileTrigger?.querySelector('span');
 
-		if (posts.length === 0 || tocLinks.length === 0) return;
+		if (articles.length === 0) return;
 
-		// Intersection Observer to highlight ToC links during scroll
-		const observerOptions = {
-			root: null,
-			rootMargin: '-25% 0px -55% 0px',
-			threshold: 0
-		};
+		// Function to switch active visible article
+		function showArticle(targetId: string) {
+			const targetArticle = document.getElementById(targetId);
+			if (!targetArticle) return;
 
-		const observer = new IntersectionObserver((entries) => {
-			entries.forEach(entry => {
-				if (entry.isIntersecting) {
-					const activeId = entry.target.getAttribute('id');
-					tocLinks.forEach(link => {
-						const href = link.getAttribute('href');
-						if (href === `#${activeId}`) {
-							link.classList.add('active');
-						} else {
-							link.classList.remove('active');
-						}
-					});
+			// Hide all articles
+			articles.forEach(article => {
+				(article as HTMLElement).style.display = 'none';
+				article.classList.remove('active');
+			});
+
+			// Show target article
+			(targetArticle as HTMLElement).style.display = 'block';
+			targetArticle.classList.add('active');
+
+			// Update Desktop TOC highlights & scroll link into view
+			tocLinks.forEach(link => {
+				const href = link.getAttribute('href');
+				if (href === `#${targetId}`) {
+					link.classList.add('active');
+					link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				} else {
+					link.classList.remove('active');
 				}
 			});
-		}, observerOptions);
 
-		posts.forEach(post => observer.observe(post));
+			// Update Mobile TOC highlights & trigger text
+			mobileLinks.forEach(link => {
+				const target = link.getAttribute('data-target-id');
+				if (target === targetId) {
+					link.classList.add('active');
+					if (mobileTriggerText) {
+						mobileTriggerText.textContent = link.textContent?.trim() || 'Select Article...';
+					}
+				} else {
+					link.classList.remove('active');
+				}
+			});
 
-		// Smooth scrolling with header offset subtraction
+			// Scroll main window back to top smoothly
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+		}
+
+		// Wire up Desktop ToC Link Clicks
 		tocLinks.forEach(link => {
 			link.addEventListener('click', (e) => {
 				e.preventDefault();
 				const targetId = link.getAttribute('href')?.substring(1);
-				const targetEl = document.getElementById(targetId || '');
-				if (targetEl) {
-					const headerOffset = 90; // account for sticky header height + safety spacing
-					const elementPosition = targetEl.getBoundingClientRect().top;
-					const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-					
-					window.scrollTo({
-						top: offsetPosition,
-						behavior: 'smooth'
-					});
+				if (targetId) {
+					history.pushState(null, '', `#${targetId}`);
+					showArticle(targetId);
 				}
 			});
+		});
+
+		// Wire up Mobile TOC Dropdown Trigger
+		mobileTrigger?.addEventListener('click', (e) => {
+			e.stopPropagation();
+			mobileDropdown?.classList.toggle('show');
+			mobileTrigger.classList.toggle('active');
+		});
+
+		// Wire up Mobile Dropdown Link Clicks
+		mobileLinks.forEach(link => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const targetId = link.getAttribute('data-target-id');
+				if (targetId) {
+					history.pushState(null, '', `#${targetId}`);
+					showArticle(targetId);
+					mobileDropdown?.classList.remove('show');
+					mobileTrigger?.classList.remove('active');
+				}
+			});
+		});
+
+		// Close mobile dropdown when clicking outside
+		document.addEventListener('click', () => {
+			mobileDropdown?.classList.remove('show');
+			mobileTrigger?.classList.remove('active');
+		});
+
+		// Check URL hash on initial page load
+		const initialHash = window.location.hash.substring(1);
+		if (initialHash && document.getElementById(initialHash)) {
+			showArticle(initialHash);
+		} else {
+			// Show the first article by default
+			const firstId = articles[0].getAttribute('id');
+			if (firstId) showArticle(firstId);
+		}
+
+		// Handle browser Back/Forward navigation changes
+		window.addEventListener('hashchange', () => {
+			const hash = window.location.hash.substring(1);
+			if (hash && document.getElementById(hash)) {
+				showArticle(hash);
+			} else if (!hash) {
+				// Fallback to first article if hash is cleared
+				const firstId = articles[0].getAttribute('id');
+				if (firstId) showArticle(firstId);
+			}
 		});
 	});
 </script>
@@ -226,7 +418,7 @@ const publications = [
 	}
 
 	.page-header {
-		margin-bottom: 3rem;
+		margin-bottom: 2rem;
 		border-bottom: 1px solid var(--border-color);
 		padding-bottom: 1.5rem;
 	}
@@ -241,6 +433,92 @@ const publications = [
 		font-size: 1.1rem;
 		color: var(--text-secondary);
 		line-height: 1.5;
+	}
+
+	/* Mobile TOC Dropdown container */
+	.mobile-toc-container {
+		display: block;
+		margin-bottom: 2rem;
+		position: relative;
+		z-index: 10;
+	}
+
+	@media (min-width: 960px) {
+		.mobile-toc-container {
+			display: none;
+		}
+	}
+
+	.mobile-toc-dropdown {
+		display: none;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		margin-top: 0.5rem;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+		max-height: 280px;
+		overflow-y: auto;
+		z-index: 20;
+	}
+
+	.mobile-toc-dropdown.show {
+		display: block;
+	}
+
+	.mobile-toc-link {
+		display: block;
+		padding: 0.75rem 1rem;
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		text-decoration: none;
+		border-bottom: 1px solid #f3f4f6;
+		transition: background-color var(--transition-speed);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.mobile-toc-link:last-child {
+		border-bottom: none;
+	}
+
+	.mobile-toc-link:hover, .mobile-toc-link.active {
+		background: #f8fafc;
+		color: var(--accent-color);
+		font-weight: 600;
+	}
+	
+	#mobile-toc-trigger {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		padding: 0.6rem 1rem;
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+	}
+
+	#mobile-toc-trigger span {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 1rem;
+	}
+	
+	#mobile-toc-trigger.active .chevron-icon {
+		transform: rotate(180deg);
+	}
+	
+	.chevron-icon {
+		transition: transform 0.2s ease;
+		flex-shrink: 0;
 	}
 
 	/* Two-column Blog Layout Grid */
@@ -258,13 +536,12 @@ const publications = [
 	}
 
 	.research-main-content {
-		min-width: 0; /* Prevents flex/grid clipping */
+		min-width: 0;
 	}
 
 	.publications-list {
 		display: flex;
 		flex-direction: column;
-		gap: 3.5rem;
 	}
 
 	/* Blog Post Card */
@@ -337,7 +614,7 @@ const publications = [
 		font-family: var(--font-mono);
 	}
 
-	/* Paper Grid Layout (Inside Card) */
+	/* Paper Grid Layout */
 	.paper-grid {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -471,7 +748,7 @@ const publications = [
 		flex-shrink: 0;
 	}
 
-	/* Sticky Table of Contents Sidebar */
+	/* Sticky Table of Contents Sidebar (Adapts to 50+ items) */
 	.research-sidebar {
 		display: none;
 	}
@@ -487,7 +764,8 @@ const publications = [
 		top: 100px;
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 1.5rem;
+		max-height: calc(100vh - 140px); /* Restricts heights to avoid window overflow */
 	}
 
 	.sidebar-title {
@@ -500,13 +778,33 @@ const publications = [
 		margin: 0;
 		border-bottom: 1px solid var(--border-color);
 		padding-bottom: 0.5rem;
+		flex-shrink: 0;
 	}
 
+	/* Scrollable TOC Navigation container */
 	.toc-nav {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
 		border-left: 1px solid var(--border-color);
+		overflow-y: auto; /* Independent scrollbar for 50+ items */
+		padding-right: 0.5rem;
+		flex-grow: 1;
+	}
+
+	/* Styled ToC Scrollbar */
+	.toc-nav::-webkit-scrollbar {
+		width: 4px;
+	}
+	.toc-nav::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.toc-nav::-webkit-scrollbar-thumb {
+		background: var(--border-color);
+		border-radius: 2px;
+	}
+	.toc-nav::-webkit-scrollbar-thumb:hover {
+		background: var(--text-muted);
 	}
 
 	.toc-link {
@@ -520,6 +818,9 @@ const publications = [
 		margin-left: -1px;
 		transition: all var(--transition-speed) ease;
 		line-height: 1.35;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis; /* Shortens long text inside ToC */
 	}
 
 	.toc-link:hover {
@@ -539,6 +840,7 @@ const publications = [
 		border: 1px solid var(--border-color);
 		border-radius: 4px;
 		padding: 1.25rem;
+		flex-shrink: 0;
 	}
 
 	.sidebar-extra-info h4 {
