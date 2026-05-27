@@ -2,20 +2,104 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Research | seldas" description="Long-form research articles, literature reviews, and clinical safety publications.">
-	<div class="container">
+<Layout title="Research Publications | seldas" description="Academic publications, clinical safety NLP models, and Structured Product Labeling (SPL) research.">
+	<div class="container container-wide">
 		<header class="page-header">
-			<h1 class="page-title">Research Articles</h1>
-			<p class="page-subtitle">Long-form articles, literature reviews, and systematic publications in Clinical NLP and Bioinformatics.</p>
+			<h1 class="page-title">Research Publications</h1>
+			<p class="page-subtitle">Scientific papers and NLP frameworks developed for regulatory environments and clinical applications.</p>
 		</header>
 
-		<div class="placeholder-box">
-			<p>This section is under construction. Comprehensive research articles, methodology papers, and literature guides will be hosted here soon.</p>
-		</div>
+		<!-- Featured Publication Section -->
+		<article class="featured-paper-card">
+			<div class="paper-header">
+				<div class="paper-meta">
+					<span class="journal-tag">Regulatory Toxicology and Pharmacology</span>
+					<span class="pub-date">Published April 2024</span>
+				</div>
+				<h2 class="paper-display-title">
+					Bringing Safe AI to Drug Regulation: The AskFDALabel Framework
+				</h2>
+				<p class="paper-academic-title">
+					<strong>Original Title:</strong> <span class="title-italic">A framework enabling LLMs into regulatory environment for transparency and trustworthiness and its application to drug labeling document</span>
+				</p>
+				<p class="paper-authors">Leihong Wu, et al. | <span class="doi">DOI: 10.1016/j.yrtph.2024.105613</span></p>
+			</div>
+
+			<div class="paper-grid">
+				<div class="paper-summary-column">
+					<h3 class="column-title">Plain Language Summary</h3>
+					<div class="plain-text-body">
+						<p>
+							Every day, regulatory agencies like the FDA review massive volumes of drug documents, clinical trials, and safety labeling updates to protect public health. While Large Language Models (LLMs) like ChatGPT could theoretically help automate and speed up this tedious work, using them in real regulatory settings presents severe challenges: **confidentiality rules** prevent uploading proprietary drug data to external APIs, and **AI "hallucinations"** (fabricating medical facts) can have dangerous consequences.
+						</p>
+						<p>
+							This paper presents <strong>AskFDALabel</strong>: a secure, local AI framework that solves both problems. By combining semantic search indexers with secure open-source AI models running inside a private local network, AskFDALabel lets reviewers query drug labels safely. The AI generates summaries grounded <em>specifically and exclusively</em> in the actual drug label text, telling reviewers exactly where the information came from.
+						</p>
+						
+						<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
+						<ul class="highlights-list">
+							<li>
+								<strong>100% Data Privacy:</strong> Operates entirely within the agency's private servers. Sensitive or proprietary drug data never crosses the firewall.
+							</li>
+							<li>
+								<strong>Hallucination Control:</strong> Using a localized Retrieval-Augmented Generation (RAG) flow, the text generator is mathematically constrained to only summarize the specific sections retrieved by the search engine.
+							</li>
+							<li>
+								<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.
+							</li>
+							<li>
+								<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews.
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="paper-actions-column">
+					<div class="action-card">
+						<h4>Resources</h4>
+						<p class="action-desc">Read the full scientific publication detailing the system architecture, performance benchmarks, and ablation studies.</p>
+						
+						<div class="action-buttons">
+							<a href="/researches/1-s2.0-S0273230024000540-main.pdf" download class="btn btn-primary btn-full">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+								Download PDF (3.4 MB)
+							</a>
+							
+							<a href="https://www.sciencedirect.com/science/article/pii/S0273230024000540" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+								ScienceDirect Link
+							</a>
+						</div>
+					</div>
+					
+					<div class="architecture-card">
+						<h4>AskFDALabel Flow</h4>
+						<p>Splits the regulatory query pipeline into two secure modules:</p>
+						<div class="arch-flow">
+							<div class="arch-step">
+								<strong>Module S: Semantic Search</strong>
+								<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
+							</div>
+							<div class="arch-arrow">&darr;</div>
+							<div class="arch-step">
+								<strong>Module T: Text Generation</strong>
+								<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article>
 	</div>
 </Layout>
 
 <style>
+	.container-wide {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+	}
+
 	.page-header {
 		margin-bottom: 3rem;
 		border-bottom: 1px solid var(--border-color);
@@ -26,20 +110,226 @@ import Layout from '../layouts/Layout.astro';
 		font-family: var(--font-sans);
 		margin-bottom: 0.5rem;
 		font-weight: 600;
+		color: var(--text-primary);
 	}
 	.page-subtitle {
 		font-size: 1.1rem;
 		color: var(--text-secondary);
 		line-height: 1.5;
 	}
-	.placeholder-box {
-		border: 1px dashed var(--border-color);
-		padding: 4rem 2rem;
-		text-align: center;
+
+	/* Featured Paper Card */
+	.featured-paper-card {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 6px;
+		padding: 2rem;
+		margin-bottom: 4rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
+	}
+
+	.paper-header {
+		margin-bottom: 2rem;
+		border-bottom: 1px solid var(--border-color);
+		padding-bottom: 1.5rem;
+	}
+
+	.paper-meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.journal-tag {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--accent-color);
+		background: #e8f0fe;
+		padding: 0.2rem 0.5rem;
+		border-radius: 3px;
+		border: 1px solid #bfdbfe;
+	}
+
+	.pub-date {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+
+	.paper-display-title {
+		font-family: var(--font-sans);
+		font-size: 1.8rem;
+		font-weight: 600;
+		line-height: 1.25;
+		margin-bottom: 0.75rem;
+		color: var(--text-primary);
+	}
+
+	.paper-academic-title {
+		font-size: 0.9rem;
 		color: var(--text-secondary);
+		margin-bottom: 0.5rem;
+		line-height: 1.4;
+	}
+
+	.title-italic {
 		font-style: italic;
+	}
+
+	.paper-authors {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		color: var(--text-muted);
+	}
+
+	.doi {
+		font-family: var(--font-mono);
+	}
+
+	/* Paper Grid Layout */
+	.paper-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+	}
+
+	@media (min-width: 768px) {
+		.paper-grid {
+			grid-template-columns: 1fr 300px;
+		}
+	}
+
+	.column-title {
+		font-family: var(--font-sans);
+		font-size: 1.2rem;
+		font-weight: 600;
+		margin-bottom: 1rem;
+		color: var(--text-primary);
+	}
+
+	.plain-text-body {
+		font-family: var(--font-serif);
+		font-size: 1rem;
+		line-height: 1.65;
+		color: var(--text-primary);
+	}
+
+	.plain-text-body p {
+		margin-bottom: 1.25rem;
+	}
+
+	.highlights-title {
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		font-weight: 600;
+		margin-top: 1.75rem;
+		margin-bottom: 0.75rem;
+		color: var(--text-primary);
+	}
+
+	.highlights-list {
+		padding-left: 1.25rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.highlights-list li {
+		margin-bottom: 0.75rem;
+		line-height: 1.5;
+	}
+
+	.highlights-list strong {
+		color: var(--text-primary);
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+	}
+
+	/* Sidebar Action and Architecture cards */
+	.paper-actions-column {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.action-card, .architecture-card {
+		background: #ffffff;
+		border: 1px solid var(--border-color);
 		border-radius: 4px;
-		background: #fafafa;
-		font-size: 1.05rem;
+		padding: 1.25rem;
+	}
+
+	.action-card h4, .architecture-card h4 {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-primary);
+		margin-bottom: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.action-desc {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		line-height: 1.4;
+		margin-bottom: 1.25rem;
+	}
+
+	.action-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.btn-full {
+		width: 100%;
+		justify-content: center;
+		padding: 0.6rem 1rem;
+		font-size: 0.85rem;
+	}
+
+	.btn-icon {
+		margin-right: 8px;
+		flex-shrink: 0;
+	}
+
+	.architecture-card p {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		line-height: 1.4;
+		margin-bottom: 1rem;
+	}
+
+	.arch-flow {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.arch-step {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		padding: 0.75rem;
+		width: 100%;
+		font-size: 0.75rem;
+		line-height: 1.35;
+	}
+
+	.arch-step strong {
+		display: block;
+		font-family: var(--font-sans);
+		color: var(--accent-color);
+		margin-bottom: 0.25rem;
+	}
+
+	.arch-arrow {
+		color: var(--text-muted);
+		font-size: 1.25rem;
+		line-height: 1;
+		font-weight: 700;
 	}
 </style>
