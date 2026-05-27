@@ -1,46 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
 
-const publications = [
-	{
-		id: "ae-classification-2025",
-		title: "AI-Powered Safety Screening: Enhancing Drug Adverse Event Classification with AskFDALabel",
-		academicTitle: "Leveraging FDA Labeling Documents and Large Language Model to Enhance Annotation, Profiling, and Classification of Drug Adverse Events with AskFDALabel",
-		journal: "Drug Safety",
-		date: "February 2025",
-		authors: "Leihong Wu, Hong Fang, Yanyan Qu, Joshua Xu, and Weida Tong",
-		doi: "10.1007/s40264-025-01520-1",
-		doiUrl: "https://link.springer.com/article/10.1007/s40264-025-01520-1",
-		pdfUrl: "/researches/40264_2025_Article_1520.pdf",
-		pdfSize: "1.0 MB",
-		summary: "How can we train AI to read drug labels and instantly warn us about serious health risks like liver or heart damage? In this follow-up study, we applied the AskFDALabel framework directly to real-world drug safety tasks. The system achieved near-perfect accuracy in automatically detecting adverse events and classifying toxicity risks, demonstrating how secure, local AI can speed up pharmacovigilance screening while maintaining 100% data traceability.",
-		highlights: [
-			"<strong>High-Accuracy Risk Screening:</strong> Achieved outstanding F1-scores of <strong>0.978</strong> for Drug-Induced Liver Injury (DILI) risk classification and <strong>0.931</strong> for Drug-Induced Cardiotoxicity (DICT) classification.",
-			"<strong>Automated Adverse Event Annotation:</strong> Successfully flags and extracts complex adverse event terms directly from labeling texts with a high F1-score of <strong>0.911</strong>.",
-			"<strong>Streamlining Safety Workflows:</strong> Significantly reduces the manual labor and human error risk in scanning and profiling safety signals across thousands of FDA documents.",
-			"<strong>RAG Grounding:</strong> Shows how structuring regulatory databases into a Retrieval-Augmented Generation (RAG) vector pipeline enables smaller open-source models to outclass larger generalized APIs."
-		]
-	},
-	{
-		id: "askfdalabel-framework-2024",
-		title: "Bringing Safe AI to Drug Regulation: The AskFDALabel Framework",
-		academicTitle: "A framework enabling LLMs into regulatory environment for transparency and trustworthiness and its application to drug labeling document",
-		journal: "Regulatory Toxicology and Pharmacology",
-		date: "April 2024",
-		authors: "Leihong Wu, et al.",
-		doi: "10.1016/j.yrtph.2024.105613",
-		doiUrl: "https://www.sciencedirect.com/science/article/pii/S0273230024000540",
-		pdfUrl: "/researches/1-s2.0-S0273230024000540-main.pdf",
-		pdfSize: "3.4 MB",
-		summary: "Every day, regulatory agencies like the FDA review massive volumes of drug documents, clinical trials, and safety labeling updates. While Large Language Models (LLMs) like ChatGPT could theoretically help automate this tedious work, they present severe challenges: confidentiality rules prevent uploading proprietary drug data to external APIs, and AI 'hallucinations' can lead to dangerous errors. This paper presents AskFDALabel: a secure, local AI framework that solves both problems by combining semantic search indexers with secure open-source AI models running inside a private local network.",
-		highlights: [
-			"<strong>100% Data Privacy:</strong> Operates entirely within the agency's private servers. Sensitive or proprietary drug data never crosses the firewall.",
-			"<strong>Hallucination Control:</strong> Using a localized Retrieval-Augmented Generation (RAG) flow, the text generator is mathematically constrained to only summarize the specific sections retrieved by the search engine.",
-			"<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.",
-			"<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews."
-		]
-	}
-];
+const rawPublications = await getCollection('researches');
+
+// Sort publications chronologically: latest first
+const sortedPublications = rawPublications.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Render summaries for all publications
+const publications = await Promise.all(
+	sortedPublications.map(async (pub) => {
+		const { Content } = await render(pub);
+		return {
+			id: pub.id,
+			title: pub.data.title,
+			academicTitle: pub.data.academicTitle,
+			journal: pub.data.journal,
+			date: pub.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' }),
+			authors: pub.data.authors,
+			doi: pub.data.doi,
+			doiUrl: pub.data.doiUrl,
+			pdfUrl: pub.data.pdfUrl,
+			pdfSize: pub.data.pdfSize,
+			highlights: pub.data.highlights,
+			Content,
+		};
+	})
+);
 ---
 
 <Layout title="Research Publications | seldas" description="Academic publications, clinical safety NLP models, and Structured Product Labeling (SPL) research.">
@@ -70,91 +56,94 @@ const publications = [
 			<!-- Main Blog Posts List (Only one card visible at a time) -->
 			<main class="research-main-content">
 				<div class="publications-list">
-					{publications.map((pub, index) => (
-						<article class="blog-post-card" id={pub.id} key={pub.doi} style="display: none;">
-							<div class="paper-header">
-								<div class="paper-meta">
-									<span class="journal-tag">{pub.journal}</span>
-									<span class="pub-date">{pub.date}</span>
+					{publications.map((pub, index) => {
+						const { Content } = pub;
+						return (
+							<article class="blog-post-card" id={pub.id} key={pub.doi} style="display: none;">
+								<div class="paper-header">
+									<div class="paper-meta">
+										<span class="journal-tag">{pub.journal}</span>
+										<span class="pub-date">{pub.date}</span>
+									</div>
+									<h2 class="paper-display-title">
+										{pub.title}
+									</h2>
+									<p class="paper-academic-title">
+										<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
+									</p>
+									<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
 								</div>
-								<h2 class="paper-display-title">
-									{pub.title}
-								</h2>
-								<p class="paper-academic-title">
-									<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
-								</p>
-								<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
-							</div>
 
-							<div class="paper-grid">
-								<div class="paper-summary-column">
-									<h3 class="column-title">Plain Language Summary</h3>
-									<div class="plain-text-body">
-										<p>{pub.summary}</p>
+								<div class="paper-grid">
+									<div class="paper-summary-column">
+										<h3 class="column-title">Plain Language Summary</h3>
+										<div class="plain-text-body">
+											<Content />
+											
+											<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
+											<ul class="highlights-list">
+												{pub.highlights.map(hl => (
+													<li set:html={hl}></li>
+												))}
+											</ul>
+										</div>
+									</div>
+
+									<div class="paper-side-column">
+										{pub.id === "2024-04-02-askfdalabel-framework" && (
+											<div class="architecture-card">
+												<h4>AskFDALabel Flow</h4>
+												<p>Splits the regulatory query pipeline into two secure modules:</p>
+												<div class="arch-flow">
+													<div class="arch-step">
+														<strong>Module S: Semantic Search</strong>
+														<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
+													</div>
+													<div class="arch-arrow">&darr;</div>
+													<div class="arch-step">
+														<strong>Module T: Text Generation</strong>
+														<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
+													</div>
+												</div>
+											</div>
+										)}
 										
-										<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
-										<ul class="highlights-list">
-											{pub.highlights.map(hl => (
-												<li set:html={hl}></li>
-											))}
-										</ul>
+										{pub.id === "2025-02-20-ae-classification" && (
+											<div class="architecture-card">
+												<h4>Safety Benchmarks</h4>
+												<p>Evaluation results demonstrating model performance:</p>
+												<div class="arch-flow">
+													<div class="arch-step">
+														<strong>Liver Injury (DILI)</strong>
+														<span>Classifies DILI risk with an outstanding F1-score of <strong>0.978</strong>.</span>
+													</div>
+													<div class="arch-step">
+														<strong>Cardiotoxicity (DICT)</strong>
+														<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
+													</div>
+												</div>
+											</div>
+										)}
 									</div>
 								</div>
 
-								<div class="paper-side-column">
-									{pub.id === "askfdalabel-framework-2024" && (
-										<div class="architecture-card">
-											<h4>AskFDALabel Flow</h4>
-											<p>Splits the regulatory query pipeline into two secure modules:</p>
-											<div class="arch-flow">
-												<div class="arch-step">
-													<strong>Module S: Semantic Search</strong>
-													<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
-												</div>
-												<div class="arch-arrow">&darr;</div>
-												<div class="arch-step">
-													<strong>Module T: Text Generation</strong>
-													<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
-												</div>
-											</div>
-										</div>
+								<!-- Action Buttons in Card Footer -->
+								<div class="post-footer-actions">
+									{pub.pdfUrl && (
+										<a href={pub.pdfUrl} download class="btn btn-primary btn-sm">
+											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+											Download PDF ({pub.pdfSize})
+										</a>
 									)}
 									
-									{pub.id === "ae-classification-2025" && (
-										<div class="architecture-card">
-											<h4>Safety Benchmarks</h4>
-											<p>Evaluation results demonstrating model performance:</p>
-											<div class="arch-flow">
-												<div class="arch-step">
-													<strong>Liver Injury (DILI)</strong>
-													<span>Classifies DILI risk with an outstanding F1-score of <strong>0.978</strong>.</span>
-												</div>
-												<div class="arch-step">
-													<strong>Cardiotoxicity (DICT)</strong>
-													<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
-												</div>
-											</div>
-										</div>
-									)}
-								</div>
-							</div>
-
-							<!-- Action Buttons in Card Footer -->
-							<div class="post-footer-actions">
-								{pub.pdfUrl && (
-									<a href={pub.pdfUrl} download class="btn btn-primary btn-sm">
-										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-										Download PDF ({pub.pdfSize})
+									<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+										View Publisher Journal
 									</a>
-								)}
-								
-								<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-									View Publisher Journal
-								</a>
-							</div>
-						</article>
-					))}
+								</div>
+							</article>
+						);
+					})}
 				</div>
 			</main>
 
@@ -528,12 +517,12 @@ const publications = [
 
 	.plain-text-body {
 		font-family: var(--font-serif);
-		font-size: 1rem;
+		font-size: 1.05rem;
 		line-height: 1.65;
 		color: var(--text-primary);
 	}
 
-	.plain-text-body p {
+	.plain-text-body :global(p) {
 		margin-bottom: 1.25rem;
 	}
 

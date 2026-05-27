@@ -19,11 +19,20 @@ interface CalendarDay {
 	updates: typeof updates;
 }
 
+interface CalendarWeek {
+	weekLabel: string;
+	days: CalendarDay[];
+	hasUpdates: boolean;
+	weekUpdates: typeof updates;
+	weekId: string;
+}
+
 interface MonthData {
 	name: string;
 	year: number;
 	monthIndex: number; // 0-indexed: 2 = March, 3 = April, 4 = May
 	days: CalendarDay[];
+	weeks: CalendarWeek[];
 	allUpdates: typeof updates;
 }
 
@@ -76,6 +85,41 @@ function getMonthDays(year: number, monthIndex: number, updatesList: typeof upda
 	return days;
 }
 
+function getMonthWeeks(monthDays: CalendarDay[], monthName: string, year: number): CalendarWeek[] {
+	const weeks: CalendarWeek[] = [];
+	for (let i = 0; i < monthDays.length; i += 7) {
+		const weekDays = monthDays.slice(i, i + 7);
+		
+		// Find first and last valid day numbers
+		const validDays = weekDays.filter(d => d.dayNumber !== null);
+		if (validDays.length === 0) continue;
+		
+		const firstDay = validDays[0].dayNumber!;
+		const lastDay = validDays[validDays.length - 1].dayNumber!;
+		const weekLabel = `${monthName} ${firstDay} – ${lastDay}`;
+		
+		// Gather all updates in this week
+		const weekUpdates: typeof updates = [];
+		weekDays.forEach(d => {
+			if (d.updates && d.updates.length > 0) {
+				weekUpdates.push(...d.updates);
+			}
+		});
+		
+		// Sort week updates chronologically descending
+		weekUpdates.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+		
+		weeks.push({
+			weekLabel,
+			days: weekDays,
+			hasUpdates: weekUpdates.length > 0,
+			weekUpdates,
+			weekId: `${year}-${monthName.toLowerCase()}-w${Math.floor(i / 7) + 1}`
+		});
+	}
+	return weeks;
+}
+
 // Get all updates for a specific month
 function getMonthUpdates(monthIndex: number, year: number, updatesList: typeof updates) {
 	return updatesList.filter(update => {
@@ -84,12 +128,19 @@ function getMonthUpdates(monthIndex: number, year: number, updatesList: typeof u
 	}).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
+function getUpdateWeekId(updateDate: Date, weeks: CalendarWeek[]): string {
+	const dateStr = getUTCDateString(updateDate);
+	const foundWeek = weeks.find(w => w.days.some(d => d.dateStr === dateStr));
+	return foundWeek ? foundWeek.weekId : '';
+}
+
 const calendarMonths: MonthData[] = [
 	{ 
 		name: "May", 
 		year: 2026, 
 		monthIndex: 4, 
 		days: getMonthDays(2026, 4, updates),
+		weeks: getMonthWeeks(getMonthDays(2026, 4, updates), "May", 2026),
 		allUpdates: getMonthUpdates(4, 2026, updates)
 	},
 	{ 
@@ -97,6 +148,7 @@ const calendarMonths: MonthData[] = [
 		year: 2026, 
 		monthIndex: 3, 
 		days: getMonthDays(2026, 3, updates),
+		weeks: getMonthWeeks(getMonthDays(2026, 3, updates), "April", 2026),
 		allUpdates: getMonthUpdates(3, 2026, updates)
 	},
 	{ 
@@ -104,6 +156,7 @@ const calendarMonths: MonthData[] = [
 		year: 2026, 
 		monthIndex: 2, 
 		days: getMonthDays(2026, 2, updates),
+		weeks: getMonthWeeks(getMonthDays(2026, 2, updates), "March", 2026),
 		allUpdates: getMonthUpdates(2, 2026, updates)
 	}
 ];
@@ -184,57 +237,97 @@ function formatLogDate(date: Date) {
 					data-slide-index={index}
 					data-month-label={`${month.name} ${month.year}`}
 				>
-					<div class="calendar-card">
-						{/* Weekday headers */}
-						<div class="calendar-weekdays">
-							<div class="weekday-header">Sun</div>
-							<div class="weekday-header">Mon</div>
-							<div class="weekday-header">Tue</div>
-							<div class="weekday-header">Wed</div>
-							<div class="weekday-header">Thu</div>
-							<div class="weekday-header">Fri</div>
-							<div class="weekday-header">Sat</div>
-						</div>
-						
-						{/* Days grid */}
-						<div class="calendar-grid">
-							{month.days.map((cell) => {
-								const hasUpdates = cell.updates.length > 0;
-								return (
-									<div 
-										class={`calendar-cell ${cell.dayNumber === null ? 'cell-padding' : ''} ${hasUpdates ? 'cell-active' : ''}`}
-										data-date={cell.dateStr}
-										data-month={month.name.toLowerCase()}
-										key={cell.dateStr || `padding-${Math.random()}`}
-									>
-										{cell.dayNumber && (
-											<span class="cell-day-num">{cell.dayNumber}</span>
-										)}
-										
-										{hasUpdates && (
-											<div class="cell-updates">
-												{cell.updates.map((update) => {
-													const meta = getProjectMeta(update.data.project);
-													return (
-														<a 
-															href={`/updates/${update.id}`} 
-															class="cal-update-link" 
-															title={update.data.title}
-															style={`--proj-bg: ${meta.bg}; --proj-color: ${meta.color}; --proj-border: ${meta.border};`}
-															data-update-link-id={update.id}
-															key={update.id}
-														>
-															<span class="cal-update-dot" style={`background-color: ${meta.dotColor};`}></span>
-															<span class="cal-update-text">{meta.label}</span>
-														</a>
-													);
-												})}
-											</div>
+					<!-- Week-Basis Calendar Container -->
+					<div class="calendar-weeks-container">
+						{month.weeks.map((week) => {
+							return (
+								<div 
+									class={`week-row-card ${week.hasUpdates ? 'week-has-updates' : ''}`}
+									data-week-id={week.weekId}
+									data-month={month.name.toLowerCase()}
+									key={week.weekId}
+								>
+									{/* Left Section: Week Label and Update count */}
+									<div class="week-info-section">
+										<h4 class="week-label">{week.weekLabel}</h4>
+										<span class="week-status">
+											{week.weekUpdates.length > 0 
+												? `${week.weekUpdates.length} update${week.weekUpdates.length > 1 ? 's' : ''}`
+												: 'No updates'
+											}
+										</span>
+										{week.hasUpdates && (
+											<button 
+												class="btn-filter-week"
+												data-week-filter-id={week.weekId}
+												data-month={month.name.toLowerCase()}
+												title="Filter feed by this week"
+											>
+												Filter Week
+											</button>
 										)}
 									</div>
-								);
-							})}
-						</div>
+
+									{/* Center Section: Weekdays Day Strip */}
+									<div class="week-days-strip">
+										{week.days.map((cell, dayIdx) => {
+											const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+											const weekdayName = weekdayNames[dayIdx];
+											const hasUpdates = cell.updates.length > 0;
+											
+											return (
+												<div 
+													class={`day-chip ${cell.dayNumber === null ? 'day-padding' : ''} ${hasUpdates ? 'day-active' : ''}`}
+													data-date={cell.dateStr}
+													data-month={month.name.toLowerCase()}
+													data-week-id={week.weekId}
+													key={cell.dateStr || `padding-${dayIdx}-${Math.random()}`}
+													title={cell.dayNumber ? `${weekdayName}, ${month.name} ${cell.dayNumber}${hasUpdates ? ` (${cell.updates.length} updates)` : ''}` : ''}
+												>
+													<span class="day-name-label">{weekdayName}</span>
+													<div class="day-circle">
+														{cell.dayNumber && <span class="day-num-text">{cell.dayNumber}</span>}
+													</div>
+													{hasUpdates && (
+														<div class="day-update-dots">
+															{cell.updates.map(up => {
+																const meta = getProjectMeta(up.data.project);
+																return (
+																	<span 
+																		class="day-dot" 
+																		style={`background-color: ${meta.dotColor};`}
+																		title={meta.label}
+																	></span>
+																);
+															})}
+														</div>
+													)}
+												</div>
+											);
+										})}
+									</div>
+
+									{/* Right Section: Quick Links to Updates */}
+									<div class="week-quick-links">
+										{week.weekUpdates.map((update) => {
+											const meta = getProjectMeta(update.data.project);
+											return (
+												<a 
+													href={`/updates/${update.id}`} 
+													class="quick-update-badge"
+													title={update.data.title}
+													style={`--badge-bg: ${meta.bg}; --badge-color: ${meta.color}; --badge-border: ${meta.border};`}
+													key={update.id}
+												>
+													<span class="badge-dot" style={`background-color: ${meta.dotColor};`}></span>
+													<span class="badge-text">{meta.label}</span>
+												</a>
+											);
+										})}
+									</div>
+								</div>
+							);
+						})}
 					</div>
 
 					{/* Chronological updates for this month */}
@@ -253,6 +346,7 @@ function formatLogDate(date: Date) {
 										<article 
 											class="update-card" 
 											data-card-date={getUTCDateString(update.data.date)}
+											data-week-id={getUpdateWeekId(update.data.date, month.weeks)}
 											data-update-id={update.id}
 											key={update.id}
 										>
@@ -351,8 +445,9 @@ function formatLogDate(date: Date) {
 		// Initialize slider state
 		updateSlider(0);
 
-		// Calendar Cell Click Filtering
-		const activeCells = document.querySelectorAll('.calendar-cell.cell-active');
+		// Calendar Cell & Week Click Filtering
+		const activeDays = document.querySelectorAll('.day-chip.day-active');
+		const weekFilterBtns = document.querySelectorAll('.btn-filter-week');
 		const allCards = document.querySelectorAll('.update-card');
 		const clearMonthBtns = document.querySelectorAll('.clear-month-filter-btn');
 		
@@ -360,32 +455,50 @@ function formatLogDate(date: Date) {
 		const filterDateDisplay = document.getElementById('filter-date-display');
 		const clearFilterGlobal = document.getElementById('clear-filter-global');
 
-		activeCells.forEach(cell => {
-			cell.addEventListener('click', (e) => {
-				if (e.target && (e.target as HTMLElement).closest('.cal-update-link')) {
-					return;
-				}
-
-				const dateStr = cell.getAttribute('data-date');
-				const month = cell.getAttribute('data-month');
+		// 1. Day Chip Click Filtering
+		activeDays.forEach(chip => {
+			chip.addEventListener('click', () => {
+				const dateStr = chip.getAttribute('data-date');
+				const month = chip.getAttribute('data-month');
 				if (!dateStr || !month) return;
 
-				const isAlreadySelected = cell.classList.contains('cell-selected');
+				const isAlreadySelected = chip.classList.contains('day-selected');
 				
-				// Deselect active cells inside this month only
-				document.querySelectorAll(`.calendar-cell.cell-selected[data-month="${month}"]`).forEach(c => {
-					c.classList.remove('cell-selected');
-				});
+				// Deselect other selected days/weeks inside this month
+				resetMonthSelections(month);
 
 				if (isAlreadySelected) {
 					resetMonthFilters(month);
 				} else {
-					cell.classList.add('cell-selected');
+					chip.classList.add('day-selected');
 					filterCardsByDate(dateStr, month);
 				}
 			});
 		});
 
+		// 2. Week Filter Button Click Filtering
+		weekFilterBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				const weekId = btn.getAttribute('data-week-filter-id');
+				const month = btn.getAttribute('data-month');
+				const weekCard = btn.closest('.week-row-card');
+				if (!weekId || !month || !weekCard) return;
+
+				const isAlreadySelected = weekCard.classList.contains('week-selected');
+
+				// Deselect other selected days/weeks inside this month
+				resetMonthSelections(month);
+
+				if (isAlreadySelected) {
+					resetMonthFilters(month);
+				} else {
+					weekCard.classList.add('week-selected');
+					filterCardsByWeek(weekId, month);
+				}
+			});
+		});
+
+		// 3. Clear buttons inside month
 		clearMonthBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
 				const month = btn.getAttribute('data-month');
@@ -396,6 +509,15 @@ function formatLogDate(date: Date) {
 		clearFilterGlobal?.addEventListener('click', () => {
 			resetAllFilters();
 		});
+
+		function resetMonthSelections(month: string) {
+			document.querySelectorAll(`.day-chip.day-selected[data-month="${month}"]`).forEach(c => {
+				c.classList.remove('day-selected');
+			});
+			document.querySelectorAll(`.week-row-card.week-selected[data-month="${month}"]`).forEach(w => {
+				w.classList.remove('week-selected');
+			});
+		}
 
 		function filterCardsByDate(dateStr: string, month: string) {
 			allCards.forEach(card => {
@@ -431,10 +553,37 @@ function formatLogDate(date: Date) {
 			}
 		}
 
-		function resetMonthFilters(month: string) {
-			document.querySelectorAll(`.calendar-cell.cell-selected[data-month="${month}"]`).forEach(c => {
-				c.classList.remove('cell-selected');
+		function filterCardsByWeek(weekId: string, month: string) {
+			const weekCard = document.querySelector(`.week-row-card[data-week-id="${weekId}"]`);
+			const weekLabel = weekCard ? weekCard.querySelector('.week-label')?.textContent : '';
+
+			allCards.forEach(card => {
+				const cardWeekId = card.getAttribute('data-week-id');
+				const parentList = card.closest('[data-month-list]');
+				const cardMonth = parentList ? parentList.getAttribute('data-month-list') : null;
+
+				if (cardMonth === month) {
+					if (cardWeekId === weekId) {
+						(card as HTMLElement).style.display = 'block';
+						card.classList.add('highlighted-card');
+					} else {
+						(card as HTMLElement).style.display = 'none';
+						card.classList.remove('highlighted-card');
+					}
+				}
 			});
+
+			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
+			if (resetBtn) resetBtn.style.display = 'inline-block';
+
+			if (filterBanner && filterDateDisplay) {
+				filterDateDisplay.textContent = weekLabel || 'Selected Week';
+				filterBanner.style.display = 'block';
+			}
+		}
+
+		function resetMonthFilters(month: string) {
+			resetMonthSelections(month);
 
 			allCards.forEach(card => {
 				const parentList = card.closest('[data-month-list]');
@@ -448,15 +597,18 @@ function formatLogDate(date: Date) {
 			const resetBtn = document.querySelector(`.clear-month-filter-btn[data-month="${month}"]`) as HTMLElement;
 			if (resetBtn) resetBtn.style.display = 'none';
 
-			const anySelected = document.querySelectorAll('.calendar-cell.cell-selected').length > 0;
+			const anySelected = document.querySelectorAll('.day-chip.day-selected, .week-row-card.week-selected').length > 0;
 			if (!anySelected && filterBanner) {
 				filterBanner.style.display = 'none';
 			}
 		}
 
 		function resetAllFilters() {
-			document.querySelectorAll('.calendar-cell.cell-selected').forEach(c => {
-				c.classList.remove('cell-selected');
+			document.querySelectorAll('.day-chip.day-selected').forEach(c => {
+				c.classList.remove('day-selected');
+			});
+			document.querySelectorAll('.week-row-card.week-selected').forEach(w => {
+				w.classList.remove('week-selected');
 			});
 
 			allCards.forEach(card => {
@@ -661,131 +813,259 @@ function formatLogDate(date: Date) {
 		z-index: 2;
 	}
 
-	/* Calendar Card */
-	.calendar-card {
-		border: 1px solid var(--border-color);
-		border-radius: 6px;
-		overflow: hidden;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
-		background: var(--bg-base);
-	}
-
-	/* Weekdays */
-	.calendar-weekdays {
-		display: grid;
-		grid-template-columns: repeat(7, 1fr);
-		border-bottom: 1px solid var(--border-color);
-		background: #fdfdfd;
-		text-align: center;
-		font-family: var(--font-sans);
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--text-secondary);
-	}
-	.weekday-header {
-		padding: 0.75rem 0.25rem;
-		border-right: 1px solid var(--border-color);
-	}
-	.weekday-header:last-child {
-		border-right: none;
-	}
-
-	/* Grid */
-	.calendar-grid {
-		display: grid;
-		grid-template-columns: repeat(7, 1fr);
-		background: var(--border-color);
-		gap: 1px;
-	}
-
-	/* Cell */
-	.calendar-cell {
-		background: var(--bg-base);
-		min-height: 110px;
-		padding: 0.6rem;
+	/* Week-Basis Calendar Container */
+	.calendar-weeks-container {
 		display: flex;
 		flex-direction: column;
-		position: relative;
+		gap: 1.25rem;
+		background: var(--bg-base);
+	}
+
+	/* Week Row Card */
+	.week-row-card {
+		background: var(--bg-panel);
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		padding: 1.25rem;
+		display: grid;
+		grid-template-columns: 200px 1fr 220px;
+		gap: 1.5rem;
+		align-items: center;
+		transition: all var(--transition-speed) ease;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+	}
+
+	.week-row-card:hover {
+		border-color: var(--border-color-hover, #cbd5e1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+	}
+
+	.week-row-card.week-has-updates {
+		background: var(--bg-base);
+		border-left: 4px solid #cbd5e1;
+	}
+
+	.week-row-card.week-selected {
+		border-color: var(--accent-color) !important;
+		border-left-color: var(--accent-color) !important;
+		background: #f0f7ff;
+		box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.1);
+	}
+
+	/* Week Info Section */
+	.week-info-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.week-label {
+		font-family: var(--font-sans);
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		margin: 0;
+	}
+
+	.week-status {
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		color: var(--text-muted);
+		font-weight: 500;
+	}
+
+	.week-has-updates .week-status {
+		color: var(--text-secondary);
+		font-weight: 600;
+	}
+
+	.btn-filter-week {
+		margin-top: 0.4rem;
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		color: var(--text-primary);
+		padding: 0.25rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		align-self: flex-start;
 		transition: all var(--transition-speed) ease;
 	}
 
-	.cell-padding {
-		background: #fafafa;
-		background-image: repeating-linear-gradient(45deg, #f7f7f7 0, #f7f7f7 1px, transparent 0, transparent 50%);
-		background-size: 8px 8px;
-		opacity: 0.6;
+	.btn-filter-week:hover {
+		border-color: var(--accent-color);
+		color: var(--accent-color);
+		background: #f8fafc;
 	}
 
-	.cell-active {
-		cursor: pointer;
-	}
-	.cell-active:hover {
-		background: #fafcfd;
-	}
-
-	.cell-selected {
-		background: #f0f7ff !important;
-		box-shadow: inset 0 0 0 2px var(--accent-color);
-		z-index: 2;
+	.week-selected .btn-filter-week {
+		background: var(--accent-color);
+		color: #ffffff;
+		border-color: var(--accent-color);
 	}
 
-	.cell-day-num {
+	/* Week Days Strip */
+	.week-days-strip {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 0.5rem;
+	}
+
+	/* Day Chip */
+	.day-chip {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.5rem 0.25rem;
+		border-radius: 6px;
+		background: transparent;
+		transition: all var(--transition-speed) ease;
+		position: relative;
+	}
+
+	.day-name-label {
+		font-family: var(--font-sans);
+		font-size: 0.65rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		letter-spacing: 0.05em;
+	}
+
+	.day-circle {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #f1f5f9;
+		border: 1px solid transparent;
+		transition: all var(--transition-speed) ease;
+	}
+
+	.day-num-text {
 		font-family: var(--font-mono);
 		font-size: 0.85rem;
 		font-weight: 500;
 		color: var(--text-muted);
-		align-self: flex-end;
-		margin-bottom: 0.5rem;
-		line-height: 1;
 	}
-	.cell-active .cell-day-num {
+
+	.day-padding {
+		opacity: 0.2;
+		pointer-events: none;
+	}
+
+	.day-padding .day-circle {
+		background: transparent;
+		border: 1px dashed var(--border-color);
+	}
+
+	/* Active Day Chip */
+	.day-active {
+		cursor: pointer;
+	}
+
+	.day-active:hover .day-circle {
+		background: #e2e8f0;
+		transform: scale(1.05);
+	}
+
+	.day-active .day-num-text {
 		color: var(--text-primary);
 		font-weight: 700;
 	}
 
-	/* Cell Updates */
-	.cell-updates {
-		display: flex;
-		flex-direction: column;
-		gap: 0.3rem;
-		flex-grow: 1;
+	.day-active .day-circle {
+		background: #ffffff;
+		border: 1.5px solid var(--text-primary);
 	}
 
-	.cal-update-link {
+	/* Selected Day */
+	.day-selected .day-circle {
+		background: var(--accent-color) !important;
+		border-color: var(--accent-color) !important;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+	}
+
+	.day-selected .day-num-text {
+		color: #ffffff !important;
+	}
+
+	/* Day Update Dots */
+	.day-update-dots {
+		display: flex;
+		justify-content: center;
+		gap: 2px;
+		height: 6px;
+		margin-top: 2px;
+	}
+
+	.day-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+	}
+
+	/* Quick Links */
+	.week-quick-links {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		max-height: 120px;
+		overflow-y: auto;
+		padding-right: 0.25rem;
+	}
+
+	.quick-update-badge {
 		display: flex;
 		align-items: center;
 		gap: 0.35rem;
 		font-family: var(--font-sans);
-		font-size: 0.7rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		text-decoration: none;
-		padding: 0.2rem 0.4rem;
-		border-radius: 3px;
-		background: var(--proj-bg);
-		color: var(--proj-color);
-		border: 1px solid var(--proj-border);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		background: var(--badge-bg);
+		color: var(--badge-color);
+		border: 1px solid var(--badge-border);
 		transition: all var(--transition-speed) ease;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.cal-update-link:hover {
+
+	.quick-update-badge:hover {
 		filter: brightness(0.96);
 		transform: translateY(-0.5px);
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 	}
 
-	.cal-update-dot {
-		width: 5px;
-		height: 5px;
+	.badge-dot {
+		width: 6px;
+		height: 6px;
 		border-radius: 50%;
 		flex-shrink: 0;
 	}
-	.cal-update-text {
+
+	.badge-text {
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	/* Scrollbar for quick links */
+	.week-quick-links::-webkit-scrollbar {
+		width: 4px;
+	}
+	.week-quick-links::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.week-quick-links::-webkit-scrollbar-thumb {
+		background: var(--border-color);
+		border-radius: 2px;
 	}
 
 	/* Chronological Feed styling */
@@ -920,52 +1200,62 @@ function formatLogDate(date: Date) {
 	}
 
 	/* Responsive tweaks */
+	@media (max-width: 900px) {
+		.week-row-card {
+			grid-template-columns: 160px 1fr;
+			gap: 1rem;
+		}
+		.week-quick-links {
+			grid-column: span 2;
+			flex-direction: row;
+			flex-wrap: wrap;
+			max-height: none;
+			overflow-y: visible;
+		}
+	}
+
 	@media (max-width: 767px) {
 		.container-wide {
 			padding: 0 1rem;
 		}
+	}
+
+	@media (max-width: 640px) {
+		.week-row-card {
+			grid-template-columns: 1fr;
+			gap: 1.25rem;
+			padding: 1rem;
+		}
 		
-		.calendar-cell {
-			min-height: 55px;
-			padding: 0.35rem;
+		.week-info-section {
 			align-items: center;
-			justify-content: space-between;
+			text-align: center;
 		}
-
-		.cell-day-num {
+		
+		.btn-filter-week {
 			align-self: center;
-			margin-bottom: 0;
-			font-size: 0.75rem;
 		}
 
-		.cell-updates {
-			flex-direction: row;
+		.week-days-strip {
+			gap: 0.25rem;
+		}
+
+		.day-chip {
+			padding: 0.25rem 0.1rem;
+		}
+
+		.day-circle {
+			width: 28px;
+			height: 28px;
+		}
+
+		.day-num-text {
+			font-size: 0.8rem;
+		}
+
+		.week-quick-links {
+			grid-column: span 1;
 			justify-content: center;
-			flex-wrap: wrap;
-			gap: 0.2rem;
-			width: 100%;
-			flex-grow: 0;
-			margin-top: 0.15rem;
-		}
-
-		.cal-update-link {
-			padding: 0;
-			border: none;
-			background: none !important;
-			width: 6px;
-			height: 6px;
-			border-radius: 50%;
-			min-width: 6px;
-		}
-
-		.cal-update-dot {
-			width: 6px;
-			height: 6px;
-			margin: 0;
-		}
-
-		.cal-update-text {
-			display: none;
 		}
 	}
 </style>

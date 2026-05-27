@@ -24,7 +24,24 @@ const projectsCollection = defineCollection({
   }),
 });
 
+const researchesCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/researches' }),
+  schema: z.object({
+    title: z.string(),
+    academicTitle: z.string(),
+    journal: z.string(),
+    date: z.coerce.date(),
+    authors: z.string(),
+    doi: z.string(),
+    doiUrl: z.string().url(),
+    pdfUrl: z.string().optional(),
+    pdfSize: z.string().optional(),
+    highlights: z.array(z.string()).default([]),
+  }),
+});
+
 export const collections = {
   updates: updatesCollection,
   projects: projectsCollection,
+  researches: researchesCollection,
 };
