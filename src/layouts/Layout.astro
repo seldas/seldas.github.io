@@ -14,6 +14,7 @@ const {
 // Determine current active link
 const pathname = new URL(Astro.request.url).pathname;
 const isHome = pathname === '/' || pathname === '';
+const isResearch = pathname.startsWith('/research');
 const isProjects = pathname.startsWith('/projects');
 const isUpdates = pathname.startsWith('/updates');
 ---
@@ -49,6 +50,8 @@ const isUpdates = pathname.startsWith('/updates');
 				<nav class="nav">
 					<a href="/" class={isHome ? "active" : ""}>Home</a>
 					<span class="nav-sep">/</span>
+					<a href="/research" class={isResearch ? "active" : ""}>Research</a>
+					<span class="nav-sep">/</span>
 					<a href="/projects" class={isProjects ? "active" : ""}>Projects</a>
 					<span class="nav-sep">/</span>
 					<a href="/updates" class={isUpdates ? "active" : ""}>Updates</a>
@@ -82,8 +85,13 @@ const isUpdates = pathname.startsWith('/updates');
 <style>
 	/* Header Navigation */
 	.header {
-		padding: 2.5rem 0 1.5rem;
-		background: none;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		padding: 1.5rem 0;
+		background: rgba(255, 255, 255, 0.9);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 		border-bottom: 1px solid var(--border-color);
 	}
 	.nav-container {
