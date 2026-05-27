@@ -1,5 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const publications = [
+	{
+		title: "AI-Powered Safety Screening: Enhancing Drug Adverse Event Classification with AskFDALabel",
+		academicTitle: "Leveraging FDA Labeling Documents and Large Language Model to Enhance Annotation, Profiling, and Classification of Drug Adverse Events with AskFDALabel",
+		journal: "Drug Safety",
+		date: "February 2025",
+		authors: "Leihong Wu, Hong Fang, Yanyan Qu, Joshua Xu, and Weida Tong",
+		doi: "10.1007/s40264-025-01520-1",
+		doiUrl: "https://link.springer.com/article/10.1007/s40264-025-01520-1",
+		pdfUrl: "/researches/40264_2025_Article_1520.pdf",
+		pdfSize: "1.0 MB",
+		summary: "How can we train AI to read drug labels and instantly warn us about serious health risks like liver or heart damage? In this follow-up study, we applied the AskFDALabel framework directly to real-world drug safety tasks. The system achieved near-perfect accuracy in automatically detecting adverse events and classifying toxicity risks, demonstrating how secure, local AI can speed up pharmacovigilance screening while maintaining 100% data traceability.",
+		highlights: [
+			"<strong>High-Accuracy Risk Screening:</strong> Achieved outstanding F1-scores of <strong>0.978</strong> for Drug-Induced Liver Injury (DILI) risk classification and <strong>0.931</strong> for Drug-Induced Cardiotoxicity (DICT) classification.",
+			"<strong>Automated Adverse Event Annotation:</strong> Successfully flags and extracts complex adverse event terms directly from labeling texts with a high F1-score of <strong>0.911</strong>.",
+			"<strong>Streamlining Safety Workflows:</strong> Significantly reduces the manual labor and human error risk in scanning and profiling safety signals across thousands of FDA documents.",
+			"<strong>RAG Grounding:</strong> Shows how structuring regulatory databases into a Retrieval-Augmented Generation (RAG) vector pipeline enables smaller open-source models to outclass larger generalized APIs."
+		]
+	},
+	{
+		title: "Bringing Safe AI to Drug Regulation: The AskFDALabel Framework",
+		academicTitle: "A framework enabling LLMs into regulatory environment for transparency and trustworthiness and its application to drug labeling document",
+		journal: "Regulatory Toxicology and Pharmacology",
+		date: "April 2024",
+		authors: "Leihong Wu, et al.",
+		doi: "10.1016/j.yrtph.2024.105613",
+		doiUrl: "https://www.sciencedirect.com/science/article/pii/S0273230024000540",
+		pdfUrl: "/researches/1-s2.0-S0273230024000540-main.pdf",
+		pdfSize: "3.4 MB",
+		summary: "Every day, regulatory agencies like the FDA review massive volumes of drug documents, clinical trials, and safety labeling updates. While Large Language Models (LLMs) like ChatGPT could theoretically help automate this tedious work, they present severe challenges: confidentiality rules prevent uploading proprietary drug data to external APIs, and AI 'hallucinations' can lead to dangerous errors. This paper presents AskFDALabel: a secure, local AI framework that solves both problems by combining semantic search indexers with secure open-source AI models running inside a private local network.",
+		highlights: [
+			"<strong>100% Data Privacy:</strong> Operates entirely within the agency's private servers. Sensitive or proprietary drug data never crosses the firewall.",
+			"<strong>Hallucination Control:</strong> Using a localized Retrieval-Augmented Generation (RAG) flow, the text generator is mathematically constrained to only summarize the specific sections retrieved by the search engine.",
+			"<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.",
+			"<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews."
+		]
+	}
+];
 ---
 
 <Layout title="Research Publications | seldas" description="Academic publications, clinical safety NLP models, and Structured Product Labeling (SPL) research.">
@@ -9,87 +48,95 @@ import Layout from '../layouts/Layout.astro';
 			<p class="page-subtitle">Scientific papers and NLP frameworks developed for regulatory environments and clinical applications.</p>
 		</header>
 
-		<!-- Featured Publication Section -->
-		<article class="featured-paper-card">
-			<div class="paper-header">
-				<div class="paper-meta">
-					<span class="journal-tag">Regulatory Toxicology and Pharmacology</span>
-					<span class="pub-date">Published April 2024</span>
-				</div>
-				<h2 class="paper-display-title">
-					Bringing Safe AI to Drug Regulation: The AskFDALabel Framework
-				</h2>
-				<p class="paper-academic-title">
-					<strong>Original Title:</strong> <span class="title-italic">A framework enabling LLMs into regulatory environment for transparency and trustworthiness and its application to drug labeling document</span>
-				</p>
-				<p class="paper-authors">Leihong Wu, et al. | <span class="doi">DOI: 10.1016/j.yrtph.2024.105613</span></p>
-			</div>
-
-			<div class="paper-grid">
-				<div class="paper-summary-column">
-					<h3 class="column-title">Plain Language Summary</h3>
-					<div class="plain-text-body">
-						<p>
-							Every day, regulatory agencies like the FDA review massive volumes of drug documents, clinical trials, and safety labeling updates to protect public health. While Large Language Models (LLMs) like ChatGPT could theoretically help automate and speed up this tedious work, using them in real regulatory settings presents severe challenges: **confidentiality rules** prevent uploading proprietary drug data to external APIs, and **AI "hallucinations"** (fabricating medical facts) can have dangerous consequences.
+		<div class="publications-list">
+			{publications.map((pub, index) => (
+				<article class="featured-paper-card" key={pub.doi}>
+					<div class="paper-header">
+						<div class="paper-meta">
+							<span class="journal-tag">{pub.journal}</span>
+							<span class="pub-date">Published {pub.date}</span>
+						</div>
+						<h2 class="paper-display-title">
+							{pub.title}
+						</h2>
+						<p class="paper-academic-title">
+							<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
 						</p>
-						<p>
-							This paper presents <strong>AskFDALabel</strong>: a secure, local AI framework that solves both problems. By combining semantic search indexers with secure open-source AI models running inside a private local network, AskFDALabel lets reviewers query drug labels safely. The AI generates summaries grounded <em>specifically and exclusively</em> in the actual drug label text, telling reviewers exactly where the information came from.
-						</p>
-						
-						<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
-						<ul class="highlights-list">
-							<li>
-								<strong>100% Data Privacy:</strong> Operates entirely within the agency's private servers. Sensitive or proprietary drug data never crosses the firewall.
-							</li>
-							<li>
-								<strong>Hallucination Control:</strong> Using a localized Retrieval-Augmented Generation (RAG) flow, the text generator is mathematically constrained to only summarize the specific sections retrieved by the search engine.
-							</li>
-							<li>
-								<strong>Full Auditing & Explainability:</strong> Unlike generic AI black boxes, every response includes clickable references and citations pointing to the exact paragraphs used, providing a complete audit trail.
-							</li>
-							<li>
-								<strong>Equally Powerful, Fractions of the Cost:</strong> Proves that smaller, cost-effective models (like Llama-2 and Falcon) hosted locally match the accuracy of OpenAI's GPT-4 in specialized regulatory reviews.
-							</li>
-						</ul>
+						<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
 					</div>
-				</div>
 
-				<div class="paper-actions-column">
-					<div class="action-card">
-						<h4>Resources</h4>
-						<p class="action-desc">Read the full scientific publication detailing the system architecture, performance benchmarks, and ablation studies.</p>
-						
-						<div class="action-buttons">
-							<a href="/researches/1-s2.0-S0273230024000540-main.pdf" download class="btn btn-primary btn-full">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-								Download PDF (3.4 MB)
-							</a>
+					<div class="paper-grid">
+						<div class="paper-summary-column">
+							<h3 class="column-title">Plain Language Summary</h3>
+							<div class="plain-text-body">
+								<p>{pub.summary}</p>
+								
+								<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
+								<ul class="highlights-list">
+									{pub.highlights.map(hl => (
+										<li set:html={hl}></li>
+									))}
+								</ul>
+							</div>
+						</div>
+
+						<div class="paper-actions-column">
+							<div class="action-card">
+								<h4>Resources</h4>
+								<p class="action-desc">Read the full scientific publication detailing the system architecture, performance benchmarks, and ablation studies.</p>
+								
+								<div class="action-buttons">
+									<a href={pub.pdfUrl} download class="btn btn-primary btn-full">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+										Download PDF ({pub.pdfSize})
+									</a>
+									
+									<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+										Journal Link
+									</a>
+								</div>
+							</div>
 							
-							<a href="https://www.sciencedirect.com/science/article/pii/S0273230024000540" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-								ScienceDirect Link
-							</a>
+							{index === 1 && (
+								<div class="architecture-card">
+									<h4>AskFDALabel Flow</h4>
+									<p>Splits the regulatory query pipeline into two secure modules:</p>
+									<div class="arch-flow">
+										<div class="arch-step">
+											<strong>Module S: Semantic Search</strong>
+											<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
+										</div>
+										<div class="arch-arrow">&darr;</div>
+										<div class="arch-step">
+											<strong>Module T: Text Generation</strong>
+											<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
+										</div>
+									</div>
+								</div>
+							)}
+							
+							{index === 0 && (
+								<div class="architecture-card">
+									<h4>Safety Benchmarks</h4>
+									<p>Evaluation results demonstrating model performance:</p>
+									<div class="arch-flow">
+										<div class="arch-step">
+											<strong>Liver Injury (DILI)</strong>
+											<span>Classifies DILI risk with an outstanding F1-score of <strong>0.978</strong>.</span>
+										</div>
+										<div class="arch-step">
+											<strong>Cardiotoxicity (DICT)</strong>
+											<span>Detects DICT risk signals with an F1-score of <strong>0.931</strong>.</span>
+										</div>
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
-					
-					<div class="architecture-card">
-						<h4>AskFDALabel Flow</h4>
-						<p>Splits the regulatory query pipeline into two secure modules:</p>
-						<div class="arch-flow">
-							<div class="arch-step">
-								<strong>Module S: Semantic Search</strong>
-								<span>Converts drug labels into word vectors to query and pull relevant warning text.</span>
-							</div>
-							<div class="arch-arrow">&darr;</div>
-							<div class="arch-step">
-								<strong>Module T: Text Generation</strong>
-								<span>Summarizes the extracted text using a secure, local LLM to generate the final response.</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</article>
+				</article>
+			))}
+		</div>
 	</div>
 </Layout>
 
@@ -118,13 +165,19 @@ import Layout from '../layouts/Layout.astro';
 		line-height: 1.5;
 	}
 
+	.publications-list {
+		display: flex;
+		flex-direction: column;
+		gap: 3.5rem;
+		margin-bottom: 4rem;
+	}
+
 	/* Featured Paper Card */
 	.featured-paper-card {
 		background: var(--bg-panel);
 		border: 1px solid var(--border-color);
 		border-radius: 6px;
 		padding: 2rem;
-		margin-bottom: 4rem;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
 	}
 
