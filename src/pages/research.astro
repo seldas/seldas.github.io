@@ -261,6 +261,8 @@ const publications = await Promise.all(
 		const btnNext = document.getElementById('cal-next');
 
 		const allDates = Object.keys(dateMap).sort();
+		const availableMonths = [...new Set(allDates.map(d => d.substring(0, 7)))].sort(); // e.g. ["2024-04", "2025-02", "2026-05"]
+		
 		let currentDisplayDate = new Date();
 		if (allDates.length > 0) {
 			const latestDate = new Date(allDates[allDates.length - 1] + "T00:00:00");
@@ -332,18 +334,51 @@ const publications = await Promise.all(
 				}
 				calGrid.appendChild(cell);
 			}
+
+			// Update button states based on available months
+			const currentMonthStr = `${year}-${String(month+1).padStart(2, '0')}`;
+			if (btnPrev) {
+				const hasPrev = availableMonths.some(m => m < currentMonthStr);
+				btnPrev.style.opacity = hasPrev ? '1' : '0.3';
+				btnPrev.style.pointerEvents = hasPrev ? 'auto' : 'none';
+			}
+			if (btnNext) {
+				const hasNext = availableMonths.some(m => m > currentMonthStr);
+				btnNext.style.opacity = hasNext ? '1' : '0.3';
+				btnNext.style.pointerEvents = hasNext ? 'auto' : 'none';
+			}
 		}
 
 		if (btnPrev) {
 			btnPrev.addEventListener('click', () => {
-				currentDisplayDate.setMonth(currentDisplayDate.getMonth() - 1);
-				renderCalendar(currentDisplayDate);
+				const year = currentDisplayDate.getFullYear();
+				const month = currentDisplayDate.getMonth();
+				const currentMonthStr = `${year}-${String(month+1).padStart(2, '0')}`;
+				
+				// Find largest month smaller than current
+				const prevMonths = availableMonths.filter(m => m < currentMonthStr);
+				if (prevMonths.length > 0) {
+					const targetMonthStr = prevMonths[prevMonths.length - 1]; // e.g., "2025-02"
+					const parts = targetMonthStr.split('-');
+					currentDisplayDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+					renderCalendar(currentDisplayDate);
+				}
 			});
 		}
 		if (btnNext) {
 			btnNext.addEventListener('click', () => {
-				currentDisplayDate.setMonth(currentDisplayDate.getMonth() + 1);
-				renderCalendar(currentDisplayDate);
+				const year = currentDisplayDate.getFullYear();
+				const month = currentDisplayDate.getMonth();
+				const currentMonthStr = `${year}-${String(month+1).padStart(2, '0')}`;
+				
+				// Find smallest month larger than current
+				const nextMonths = availableMonths.filter(m => m > currentMonthStr);
+				if (nextMonths.length > 0) {
+					const targetMonthStr = nextMonths[0]; // e.g., "2026-05"
+					const parts = targetMonthStr.split('-');
+					currentDisplayDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+					renderCalendar(currentDisplayDate);
+				}
 			});
 		}
 
@@ -850,7 +885,7 @@ const publications = await Promise.all(
 	}
 
 	/* Calendar Widget Styles */
-	.calendar-widget {
+	:global(.calendar-widget) {
 		background: #ffffff;
 		border: 1px solid var(--border-color);
 		border-radius: 6px;
@@ -858,19 +893,19 @@ const publications = await Promise.all(
 		box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 		margin-bottom: 1rem;
 	}
-	.calendar-header {
+	:global(.calendar-header) {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 1rem;
 	}
-	.cal-title {
+	:global(.cal-title) {
 		font-family: var(--font-sans);
 		font-weight: 600;
 		font-size: 0.95rem;
 		color: var(--text-primary);
 	}
-	.cal-btn {
+	:global(.cal-btn) {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -878,12 +913,13 @@ const publications = await Promise.all(
 		font-size: 1rem;
 		padding: 0.2rem 0.5rem;
 		border-radius: 4px;
+		transition: opacity 0.2s;
 	}
-	.cal-btn:hover {
+	:global(.cal-btn:hover) {
 		background: #f1f5f9;
 		color: var(--accent-color);
 	}
-	.calendar-days-header {
+	:global(.calendar-days-header) {
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		text-align: center;
@@ -893,26 +929,26 @@ const publications = await Promise.all(
 		font-weight: 600;
 		margin-bottom: 0.5rem;
 	}
-	.calendar-grid {
+	:global(.calendar-grid) {
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		gap: 2px;
 	}
-	.cal-day {
+	:global(.cal-day) {
 		aspect-ratio: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 0.8rem;
-		font-family: var(--font-mono);
+		font-family: var(--font-sans);
 		color: var(--text-secondary);
 		border-radius: 4px;
 		cursor: default;
 	}
-	.cal-day.empty {
+	:global(.cal-day.empty) {
 		background: transparent;
 	}
-	.cal-day.has-post {
+	:global(.cal-day.has-post) {
 		background: #e8f0fe;
 		color: var(--accent-color);
 		font-weight: 700;
@@ -920,11 +956,11 @@ const publications = await Promise.all(
 		transition: all 0.2s;
 		position: relative;
 	}
-	.cal-day.has-post:hover {
+	:global(.cal-day.has-post:hover) {
 		background: #dbeafe;
 		transform: scale(1.05);
 	}
-	.cal-day.has-post::after {
+	:global(.cal-day.has-post::after) {
 		content: '';
 		position: absolute;
 		bottom: 3px;
@@ -933,20 +969,20 @@ const publications = await Promise.all(
 		background: var(--accent-color);
 		border-radius: 50%;
 	}
-	.cal-day.active-post {
+	:global(.cal-day.active-post) {
 		background: var(--accent-color);
 		color: #ffffff;
 	}
-	.cal-day.active-post::after {
+	:global(.cal-day.active-post::after) {
 		background: #ffffff;
 	}
-	.calendar-posts-list {
+	:global(.calendar-posts-list) {
 		margin-top: 1rem;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
 	}
-	.cal-post-link {
+	:global(.cal-post-link) {
 		font-family: var(--font-sans);
 		font-size: 0.8rem;
 		color: var(--text-secondary);
@@ -960,7 +996,7 @@ const publications = await Promise.all(
 		text-overflow: ellipsis;
 		transition: background 0.2s;
 	}
-	.cal-post-link:hover {
+	:global(.cal-post-link:hover) {
 		background: #f1f5f9;
 		color: var(--accent-color);
 	}
