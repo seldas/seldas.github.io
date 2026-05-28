@@ -103,12 +103,12 @@ const publications = await Promise.all(
 										{pub.ContentEn && (
 											<div class="lang-switcher-container" style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
 												<div class="btn-group" style="display: flex; gap: 0.5rem;" role="group" aria-label="Language Switcher">
-													<button type="button" class="btn btn-sm btn-secondary lang-btn active" data-target={pub.id} data-lang="zh" style="opacity: 1; border: 1px solid var(--border-color);">中文</button>
-													<button type="button" class="btn btn-sm btn-secondary lang-btn" data-target={pub.id} data-lang="en" style="opacity: 0.6; border: 1px solid var(--border-color);">English</button>
+													<button type="button" class="btn btn-sm btn-secondary lang-btn" data-target={pub.id} data-lang="zh" style="opacity: 0.6; border: 1px solid var(--border-color);">中文</button>
+													<button type="button" class="btn btn-sm btn-secondary lang-btn active" data-target={pub.id} data-lang="en" style="opacity: 1; border: 1px solid var(--border-color);">English</button>
 												</div>
 											</div>
 										)}
-										<div class={`plain-text-body content-zh-${pub.id}`}>
+										<div class={`plain-text-body content-zh-${pub.id}`} style={pub.ContentEn ? "display: none;" : ""}>
 											<Content />
 											
 											{pub.highlights && pub.highlights.length > 0 && (
@@ -124,7 +124,7 @@ const publications = await Promise.all(
 										</div>
 
 										{pub.ContentEn && (
-											<div class={`plain-text-body content-en-${pub.id}`} style="display: none;">
+											<div class={`plain-text-body content-en-${pub.id}`} style="display: block;">
 												{(() => { const ContentEn = pub.ContentEn; return <ContentEn /> })()}
 												
 												{pub.enHighlights && pub.enHighlights.length > 0 && (
