@@ -97,7 +97,7 @@ const publications = await Promise.all(
 									)}
 								</div>
 
-								<div class="paper-grid">
+								<div class={['2024-04-02-askfdalabel-framework', '2025-02-20-ae-classification'].includes(pub.id) ? "paper-grid" : "paper-single-column"}>
 									<div class="paper-summary-column">
 										<h3 class="column-title">Plain Language Summary</h3>
 										{pub.ContentEn && (
@@ -141,7 +141,8 @@ const publications = await Promise.all(
 										)}
 									</div>
 
-									<div class="paper-side-column">
+									{['2024-04-02-askfdalabel-framework', '2025-02-20-ae-classification'].includes(pub.id) && (
+										<div class="paper-side-column">
 										{pub.id === "2024-04-02-askfdalabel-framework" && (
 											<div class="architecture-card">
 												<h4>AskFDALabel Flow</h4>
@@ -177,6 +178,7 @@ const publications = await Promise.all(
 											</div>
 										)}
 									</div>
+									)}
 								</div>
 
 								<!-- Action Buttons in Card Footer -->
@@ -578,6 +580,10 @@ const publications = await Promise.all(
 
 	.doi {
 		font-family: var(--font-mono);
+	}
+
+	.paper-single-column {
+		max-width: 850px;
 	}
 
 	/* Paper Grid Layout */
