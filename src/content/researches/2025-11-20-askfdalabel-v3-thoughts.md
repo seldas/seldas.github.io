@@ -1,6 +1,6 @@
 ---
 title: "askFDALabel 3.0: 研发过程中的一些思考与探索"
-date: "2026-05-28"
+date: "2025-11-20"
 highlights:
   - "引入 Agentic AI Functions (如 Label Compare / Toxicity Agents)，拓展平台能独立执行的专业任务边界。"
   - "突破传统 Semantic-RAG 和 DB-RAG 的瓶颈，着手探索和重构更智能、无底层数据库限制的新型检索问答架构。"

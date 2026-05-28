@@ -1,6 +1,6 @@
 ---
-title: "askFDALabel 3.0: Thoughts and Progress During Development"
-date: "2026-05-28"
+title: "askFDALabel 3.0: Some Thoughts and Explorations During R&D"
+date: "2025-11-20"
 highlights:
   - "Introducing Agentic AI Functions (e.g., Label Compare / Toxicity Agents) to expand the platform's independent task-execution capabilities."
   - "Breaking traditional Semantic-RAG and DB-RAG bottlenecks to explore and construct a smarter Q&A architecture free from legacy database constraints."
