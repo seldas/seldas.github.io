@@ -45,6 +45,20 @@ Beyond feature upgrades, the biggest shift at the technical foundation was movin
 **1. Efficient Acquisition and Updating**: Compared to PDFs, which have messy structures and diverse origins, officially published SPL data maintains extremely high consistency. This means our backend can perform ultra-fast data scraping, parsing, and automatic updates, ensuring that the data source for comparisons is always the most current.
 **2. Ecosystem Synergy**: SPL inherently possesses rigorous structural tags. The parsed data can be tightly bound to the core database underlying askFDALabel. This high level of data compatibility ensures the Label Compare module is not an isolated island, but deeply rooted within the entire platform's ecosystem.
 
-## 4. Conclusion
+## 4. Looking Ahead: Making Changes "Visible" and "Trackable"
+
+Having solved multi-document comparison and interactive Q&A, the future evolution of LabelComp will align even closer with the deeper needs of reviewers: not just identifying "what changed," but answering "does it matter?" and "what is the trend?" We are currently actively advancing development in the following two core directions:
+
+**1. Intelligent Triage & Highlighting (Surfacing "High-Impact" Changes)**
+A reviewer's biggest fear is not missing an update, but drowning in a sea of trivial modifications (like formatting tweaks or synonym replacements). The future LabelComp will introduce **"Impact Triage"**:
+*   **Semantic Severity Assessment**: The AI will score differences based on their clinical and regulatory significance. For instance, a shift in the population definition within `Contraindications` or a `Boxed Warning` will be instantly highlighted in red and pinned to the top, while simple punctuation fixes or rephrasing will be automatically collapsed.
+*   **Personalized Review Anchors**: Reviewers will be able to input their specific "review intent" (e.g., *"Focus primarily on new safety signals in the pregnant population for this drug"*). The system will dynamically adjust the weighting of the comparison results to push highly relevant modifications front and center.
+
+**2. Longitudinal Tracking and Dynamic Evolution (Longitudinal Tracking)**
+Reviewing is often a continuous process spanning a long timeline, rather than a single horizontal comparison.
+*   **Lifecycle Maps of Safety Signals**: For specific changes a reviewer is tracking (e.g., an adverse reaction incidence rising from 1% to 3%, then to 5%), the system should be able to visualize this as an evolving chronological timeline.
+*   **Class Labeling Tracking**: When the system detects a new severe warning added to Drug A, it should **proactively prompt** the reviewer if other drugs with the same target or mechanism of action have similar modification histories, helping reviewers quickly build a macroscopic understanding of class-wide safety.
+
+## 5. Conclusion
 
 From a highly targeted PDF+BERT tool specialized for specific tasks, to the current SPL+LLM hybrid architecture that integrates "Comparison, Summarization, and Q&A" and easily handles multi-file comparisons—Label Compare has undergone an objective and profound evolution. This has not only vastly broadened the system's operational scope but also provided the ultimate best-practice template for further liberating experts from repetitive tasks in the future.
