@@ -4,13 +4,27 @@ import { getCollection, render } from 'astro:content';
 
 const rawPublications = await getCollection('researches');
 
+// Filter out English versions from the main list
+const mainPublications = rawPublications.filter(pub => !pub.id.endsWith('-en'));
+
 // Sort publications chronologically: latest first
-const sortedPublications = rawPublications.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const sortedPublications = mainPublications.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 // Render summaries for all publications
 const publications = await Promise.all(
 	sortedPublications.map(async (pub) => {
 		const { Content } = await render(pub);
+		
+		// Find English counterpart
+		const enPub = rawPublications.find(p => p.id === `${pub.id}-en`);
+		let ContentEn = null;
+		let enHighlights: string[] = [];
+		if (enPub) {
+			const renderedEn = await render(enPub);
+			ContentEn = renderedEn.Content;
+			enHighlights = enPub.data.highlights || [];
+		}
+
 		return {
 			id: pub.id,
 			title: pub.data.title,
@@ -24,6 +38,8 @@ const publications = await Promise.all(
 			pdfSize: pub.data.pdfSize,
 			highlights: pub.data.highlights,
 			Content,
+			ContentEn,
+			enHighlights,
 		};
 	})
 );
@@ -62,31 +78,67 @@ const publications = await Promise.all(
 							<article class="blog-post-card" id={pub.id} key={pub.doi} style="display: none;">
 								<div class="paper-header">
 									<div class="paper-meta">
-										<span class="journal-tag">{pub.journal}</span>
+										{pub.journal && <span class="journal-tag">{pub.journal}</span>}
 										<span class="pub-date">{pub.date}</span>
 									</div>
 									<h2 class="paper-display-title">
 										{pub.title}
 									</h2>
-									<p class="paper-academic-title">
-										<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
-									</p>
-									<p class="paper-authors">{pub.authors} | <span class="doi">DOI: {pub.doi}</span></p>
+									{pub.academicTitle && (
+										<p class="paper-academic-title">
+											<strong>Original Title:</strong> <span class="title-italic">{pub.academicTitle}</span>
+										</p>
+									)}
+									{(pub.authors || pub.doi) && (
+										<p class="paper-authors">
+											{pub.authors && <span>{pub.authors}</span>}
+											{pub.doi && <span> | <span class="doi">DOI: {pub.doi}</span></span>}
+										</p>
+									)}
 								</div>
 
 								<div class="paper-grid">
 									<div class="paper-summary-column">
 										<h3 class="column-title">Plain Language Summary</h3>
-										<div class="plain-text-body">
+										{pub.ContentEn && (
+											<div class="lang-switcher-container" style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+												<div class="btn-group" style="display: flex; gap: 0.5rem;" role="group" aria-label="Language Switcher">
+													<button type="button" class="btn btn-sm btn-secondary lang-btn active" data-target={pub.id} data-lang="zh" style="opacity: 1; border: 1px solid var(--border-color);">中文</button>
+													<button type="button" class="btn btn-sm btn-secondary lang-btn" data-target={pub.id} data-lang="en" style="opacity: 0.6; border: 1px solid var(--border-color);">English</button>
+												</div>
+											</div>
+										)}
+										<div class={`plain-text-body content-zh-${pub.id}`}>
 											<Content />
 											
-											<h4 class="highlights-title">Key Outcomes & Innovations:</h4>
-											<ul class="highlights-list">
-												{pub.highlights.map(hl => (
-													<li set:html={hl}></li>
-												))}
-											</ul>
+											{pub.highlights && pub.highlights.length > 0 && (
+												<>
+													<h4 class="highlights-title">核心记录 / Key Highlights:</h4>
+													<ul class="highlights-list">
+														{pub.highlights.map(hl => (
+															<li set:html={hl}></li>
+														))}
+													</ul>
+												</>
+											)}
 										</div>
+
+										{pub.ContentEn && (
+											<div class={`plain-text-body content-en-${pub.id}`} style="display: none;">
+												{(() => { const ContentEn = pub.ContentEn; return <ContentEn /> })()}
+												
+												{pub.enHighlights && pub.enHighlights.length > 0 && (
+													<>
+														<h4 class="highlights-title">Key Highlights:</h4>
+														<ul class="highlights-list">
+															{pub.enHighlights.map(hl => (
+																<li set:html={hl}></li>
+															))}
+														</ul>
+													</>
+												)}
+											</div>
+										)}
 									</div>
 
 									<div class="paper-side-column">
@@ -136,10 +188,12 @@ const publications = await Promise.all(
 										</a>
 									)}
 									
-									<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-										View Publisher Journal
-									</a>
+									{pub.doiUrl && (
+										<a href={pub.doiUrl} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+											View Publisher Journal
+										</a>
+									)}
 								</div>
 							</article>
 						);
@@ -178,8 +232,40 @@ const publications = await Promise.all(
 		const mobileTrigger = document.getElementById('mobile-toc-trigger');
 		const mobileDropdown = document.getElementById('mobile-toc-dropdown');
 		const mobileTriggerText = mobileTrigger?.querySelector('span');
+		const langBtns = document.querySelectorAll('.lang-btn');
 
 		if (articles.length === 0) return;
+
+		// Language Switcher Logic
+		langBtns.forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const target = e.currentTarget as HTMLElement;
+				const id = target.getAttribute('data-target');
+				const lang = target.getAttribute('data-lang');
+				
+				// Update active state of buttons for this post
+				document.querySelectorAll(`.lang-btn[data-target="${id}"]`).forEach(b => {
+					b.classList.remove('active');
+					(b as HTMLElement).style.opacity = '0.6';
+				});
+				target.classList.add('active');
+				target.style.opacity = '1';
+
+				// Toggle content visibility
+				const zhContent = document.querySelector(`.content-zh-${id}`) as HTMLElement;
+				const enContent = document.querySelector(`.content-en-${id}`) as HTMLElement;
+				
+				if (zhContent && enContent) {
+					if (lang === 'en') {
+						zhContent.style.display = 'none';
+						enContent.style.display = 'block';
+					} else {
+						zhContent.style.display = 'block';
+						enContent.style.display = 'none';
+					}
+				}
+			});
+		});
 
 		// Function to switch active visible article
 		function showArticle(targetId: string) {
