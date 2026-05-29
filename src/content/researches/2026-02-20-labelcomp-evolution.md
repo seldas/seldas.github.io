@@ -1,6 +1,6 @@
 ---
 title: "askFDALabel 3.0: 从 PDF 到 SPL，Label Compare 架构的客观演进与最佳实践探索"
-date: "2026-05-28"
+date: "2026-02-20"
 highlights:
   - "客观评价基于 PDF+BERT 模型的早期尝试在特定实体抽取（如不良事件）任务中的极高准确性与实用价值。"
   - "深入剖析 askFDALabel 3.0 中 Label Compare 功能的核心进化：支持多文本总结、互动 Q&A 以及基于 SPL 的高速数据流转。"

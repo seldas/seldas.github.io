@@ -1,6 +1,6 @@
 ---
 title: "askFDALabel 3.0: From PDF to SPL—The Objective Evolution of Label Compare and Best Practices"
-date: "2026-05-28"
+date: "2026-02-20"
 highlights:
   - "Objectively evaluate the early attempts of PDF+BERT models and their high accuracy and practical value in specific entity extraction tasks (such as adverse events)."
   - "Deep dive into the core evolution of Label Compare in askFDALabel 3.0: supporting multi-text summarization, interactive Q&A, and high-speed data flow based on SPL."
