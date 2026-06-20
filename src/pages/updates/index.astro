@@ -2,6 +2,21 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 
+function getSummary(body: string | undefined) {
+	if (!body) return '';
+	const lines = body.split('\n');
+	for (let line of lines) {
+		line = line.trim();
+		if (line && !line.startsWith('#') && !line.startsWith('-') && !line.startsWith('*') && !line.startsWith('---') && !line.startsWith('>')) {
+			if (line.length > 180) {
+				return line.substring(0, 177) + '...';
+			}
+			return line;
+		}
+	}
+	return '';
+}
+
 const rawUpdates = await getCollection('updates');
 const updates = await Promise.all(
 	rawUpdates.map(async (up) => {
@@ -9,6 +24,7 @@ const updates = await Promise.all(
 		return {
 			id: up.id,
 			data: up.data,
+			summary: up.data.description || getSummary(up.body),
 			Content
 		};
 	})
@@ -342,6 +358,7 @@ function formatLogDate(date: Date) {
 												<a 
 													href={`/updates/${update.id}`} 
 													class="quick-update-badge"
+													data-update-id={update.id}
 													title={update.data.title}
 													style={`--badge-bg: ${meta.bg}; --badge-color: ${meta.color}; --badge-border: ${meta.border};`}
 													key={update.id}
@@ -392,8 +409,8 @@ function formatLogDate(date: Date) {
 														<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-svg"><polyline points="6 9 12 15 18 9"></polyline></svg>
 													</span>
 												</h4>
-												{update.data.description && (
-													<p class="update-card-desc">{update.data.description}</p>
+												{update.summary && (
+													<p class="update-card-desc">{update.summary}</p>
 												)}
 												<div class="update-card-tags-row">
 													{update.data.tags.map(tag => (
@@ -427,8 +444,28 @@ function formatLogDate(date: Date) {
 				</section>
 			))}
 		</div>
+
+		<!-- Update Preview Modal -->
+		<div id="preview-modal" class="modal-overlay" style="display: none;">
+			<div class="modal-container">
+				<button id="modal-close-btn" class="modal-close-btn" aria-label="Close Modal">&times;</button>
+				<div class="modal-header">
+					<time id="modal-date" class="modal-date"></time>
+					<span id="modal-project-badge" class="badge"></span>
+				</div>
+				<h3 id="modal-title" class="modal-title"></h3>
+				<p id="modal-desc" class="modal-desc"></p>
+				<div class="modal-footer">
+					<button id="modal-view-details-btn" class="btn btn-primary">View Details</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </Layout>
+
+<script is:inline define:vars={{ updatesData: updates.map(u => ({ id: u.id, title: u.data.title, formattedDate: u.data.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }), project: u.data.project, description: u.summary, projectLabel: getProjectMeta(u.data.project).label, projectBg: getProjectMeta(u.data.project).bg, projectColor: getProjectMeta(u.data.project).color, projectBorder: getProjectMeta(u.data.project).border })) }}>
+	window.updatesData = updatesData;
+</script>
 
 <script>
 	// Interactive Calendar & Month Slider Script
@@ -675,6 +712,77 @@ function formatLogDate(date: Date) {
 				if (!card) return;
 				card.classList.toggle('expanded');
 			});
+		});
+
+		// Preview Modal Logic
+		const modalOverlay = document.getElementById('preview-modal');
+		const modalCloseBtn = document.getElementById('modal-close-btn');
+		const modalDate = document.getElementById('modal-date');
+		const modalBadge = document.getElementById('modal-project-badge');
+		const modalTitle = document.getElementById('modal-title');
+		const modalDesc = document.getElementById('modal-desc');
+		const modalViewDetailsBtn = document.getElementById('modal-view-details-btn');
+		const quickBadges = document.querySelectorAll('.quick-update-badge');
+
+		// Open Modal on Badge Click
+		quickBadges.forEach(badge => {
+			badge.addEventListener('click', (e) => {
+				e.preventDefault();
+				const updateId = badge.getAttribute('data-update-id');
+				if (!updateId || !window.updatesData) return;
+
+				const update = window.updatesData.find(u => u.id === updateId);
+				if (!update) return;
+
+				// Populate modal
+				if (modalDate) modalDate.textContent = update.formattedDate;
+				if (modalBadge) {
+					modalBadge.textContent = update.projectLabel;
+					modalBadge.style.backgroundColor = update.projectBg;
+					modalBadge.style.color = update.projectColor;
+					modalBadge.style.borderColor = update.projectBorder;
+				}
+				if (modalTitle) modalTitle.textContent = update.title;
+				if (modalDesc) modalDesc.textContent = update.description;
+				if (modalViewDetailsBtn) modalViewDetailsBtn.setAttribute('data-target-id', updateId);
+
+				// Show modal
+				if (modalOverlay) modalOverlay.style.display = 'flex';
+			});
+		});
+
+		// Close Modal Functions
+		function closeModal() {
+			if (modalOverlay) modalOverlay.style.display = 'none';
+		}
+
+		modalCloseBtn?.addEventListener('click', closeModal);
+		modalOverlay?.addEventListener('click', (e) => {
+			if (e.target === modalOverlay) closeModal();
+		});
+
+		// "View Details" click: Scroll and Expand
+		modalViewDetailsBtn?.addEventListener('click', () => {
+			const updateId = modalViewDetailsBtn.getAttribute('data-target-id');
+			if (!updateId) return;
+
+			closeModal();
+
+			const targetCard = document.querySelector(`.update-card[data-update-id="${updateId}"]`);
+			if (!targetCard) return;
+
+			// 1. Ensure the month slide containing this card is active
+			const parentSlide = targetCard.closest('.month-slide');
+			if (parentSlide) {
+				const slideIndex = parseInt(parentSlide.getAttribute('data-slide-index') || '0');
+				updateSlider(slideIndex);
+			}
+
+			// 2. Expand card
+			targetCard.classList.add('expanded');
+
+			// 3. Scroll card into view
+			targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		});
 	});
 </script>
@@ -1434,5 +1542,95 @@ function formatLogDate(date: Date) {
 			grid-column: span 1;
 			justify-content: center;
 		}
+	}
+
+	/* Modal Overlay */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(15, 23, 42, 0.4);
+		backdrop-filter: blur(2px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		padding: 1.5rem;
+	}
+
+	.modal-container {
+		background: #ffffff;
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		width: 100%;
+		max-width: 480px;
+		padding: 1.75rem;
+		position: relative;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+		animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		font-family: var(--font-sans);
+	}
+
+	@keyframes modalFadeIn {
+		from {
+			opacity: 0;
+			transform: scale(0.96) translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1) translateY(0);
+		}
+	}
+
+	.modal-close-btn {
+		position: absolute;
+		top: 0.75rem;
+		right: 1rem;
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: color 0.2s ease;
+	}
+
+	.modal-close-btn:hover {
+		color: var(--text-primary);
+	}
+
+	.modal-header {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.modal-date {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+
+	.modal-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--text-primary);
+		margin-bottom: 0.75rem;
+		line-height: 1.35;
+	}
+
+	.modal-desc {
+		font-family: var(--font-serif);
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+		margin-bottom: 1.5rem;
+	}
+
+	.modal-footer {
+		display: flex;
+		justify-content: flex-end;
 	}
 </style>
