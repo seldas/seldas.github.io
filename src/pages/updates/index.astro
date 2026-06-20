@@ -134,32 +134,49 @@ function getUpdateWeekId(updateDate: Date, weeks: CalendarWeek[]): string {
 	return foundWeek ? foundWeek.weekId : '';
 }
 
-const calendarMonths: MonthData[] = [
-	{ 
-		name: "May", 
-		year: 2026, 
-		monthIndex: 4, 
-		days: getMonthDays(2026, 4, updates),
-		weeks: getMonthWeeks(getMonthDays(2026, 4, updates), "May", 2026),
-		allUpdates: getMonthUpdates(4, 2026, updates)
-	},
-	{ 
-		name: "April", 
-		year: 2026, 
-		monthIndex: 3, 
-		days: getMonthDays(2026, 3, updates),
-		weeks: getMonthWeeks(getMonthDays(2026, 3, updates), "April", 2026),
-		allUpdates: getMonthUpdates(3, 2026, updates)
-	},
-	{ 
-		name: "March", 
-		year: 2026, 
-		monthIndex: 2, 
-		days: getMonthDays(2026, 2, updates),
-		weeks: getMonthWeeks(getMonthDays(2026, 2, updates), "March", 2026),
-		allUpdates: getMonthUpdates(2, 2026, updates)
-	}
+const monthNames = [
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December"
 ];
+
+// Dynamically generate the months list based on the updates collection
+const uniqueMonths = new Map<string, { year: number; monthIndex: number }>();
+
+// Add the current month to ensure it is always visible even if there are no updates yet
+const now = new Date();
+const currentKey = `${now.getUTCFullYear()}-${now.getUTCMonth()}`;
+uniqueMonths.set(currentKey, { year: now.getUTCFullYear(), monthIndex: now.getUTCMonth() });
+
+// Gather other months from actual updates
+updates.forEach(update => {
+	const d = update.data.date;
+	const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+	if (!uniqueMonths.has(key)) {
+		uniqueMonths.set(key, { year: d.getUTCFullYear(), monthIndex: d.getUTCMonth() });
+	}
+});
+
+// Sort months chronologically descending
+const sortedMonthKeys = Array.from(uniqueMonths.keys()).sort((a, b) => {
+	const [yA, mA] = a.split('-').map(Number);
+	const [yB, mB] = b.split('-').map(Number);
+	if (yA !== yB) return yB - yA;
+	return mB - mA;
+});
+
+const calendarMonths: MonthData[] = sortedMonthKeys.map(key => {
+	const { year, monthIndex } = uniqueMonths.get(key)!;
+	const name = monthNames[monthIndex];
+	const days = getMonthDays(year, monthIndex, updates);
+	return {
+		name,
+		year,
+		monthIndex,
+		days,
+		weeks: getMonthWeeks(days, name, year),
+		allUpdates: getMonthUpdates(monthIndex, year, updates)
+	};
+});
 
 const projectMeta: Record<string, { label: string; class: string; bg: string; color: string; border: string; dotColor: string }> = {
 	'askfdalabel': { label: 'AskFDALabel', class: 'proj-askfdalabel', bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe', dotColor: '#3b82f6' },

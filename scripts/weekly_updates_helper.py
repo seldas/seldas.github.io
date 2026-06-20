@@ -102,7 +102,7 @@ def main():
                 print(f"Error reading last update file {last_file}: {e}", file=sys.stderr)
                 
         # Run git log
-        commits = []
+        commits_by_day = {}
         try:
             # Format: YYYY-MM-DD | subject
             cmd = [
@@ -114,7 +114,19 @@ def main():
             proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
             output = proc.stdout.strip()
             if output:
-                commits = [line.strip() for line in output.split('\n') if line.strip()]
+                for line in output.split('\n'):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    parts = line.split(' | ', 1)
+                    if len(parts) == 2:
+                        day, msg = parts
+                        # Filter out duplicate commits already described in last update
+                        if last_update_content and msg.lower() in last_update_content.lower():
+                            continue
+                        if day not in commits_by_day:
+                            commits_by_day[day] = []
+                        commits_by_day[day].append(msg)
         except Exception as e:
             print(f"Error running git log for {pid}: {e}", file=sys.stderr)
             
@@ -123,7 +135,7 @@ def main():
             'latest_update_file': last_file,
             'latest_update_content': last_update_content,
             'start_date_queried': start_date.isoformat(),
-            'commits': commits
+            'commits_by_day': commits_by_day
         }
         
     print(json.dumps(results, indent=2))
