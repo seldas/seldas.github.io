@@ -295,6 +295,17 @@ a {
   border-color: transparent;
 }
 
+.badge-archived {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border-color: transparent;
+}
+
+[data-theme='dark'] .badge-archived {
+  background: rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+}
+
 /* Cards & Grids */
 .card {
   background: var(--bg-elevated);

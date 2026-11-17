@@ -107,7 +107,15 @@ const formatDate = (date: Date) =>
           flagshipProjects.map((project) => (
             <div class="card card-interactive project-card">
               <div class="project-top">
-                <span class={`badge ${project.status === 'Active' ? 'badge-active' : 'badge-done'}`}>
+                <span
+                  class={`badge ${
+                    project.status === 'Active'
+                      ? 'badge-active'
+                      : project.status === 'Archived'
+                        ? 'badge-archived'
+                        : 'badge-done'
+                  }`}
+                >
                   {project.status}
                 </span>
                 <a

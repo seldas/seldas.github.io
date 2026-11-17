@@ -42,6 +42,10 @@ const repositories = PROJECTS.filter((p) => p.category === 'repository');
           <span data-lang="en">{UI_TEXT.projectsPage.statusCompleted.en}</span>
           <span data-lang="zh">{UI_TEXT.projectsPage.statusCompleted.zh}</span>
         </button>
+        <button type="button" class="pill-btn" data-status="Archived">
+          <span data-lang="en">{UI_TEXT.projectsPage.statusArchived.en}</span>
+          <span data-lang="zh">{UI_TEXT.projectsPage.statusArchived.zh}</span>
+        </button>
       </div>
     </div>
 
@@ -64,7 +68,15 @@ const repositories = PROJECTS.filter((p) => p.category === 'repository');
             >
               <div class="flagship-head">
                 <div class="flagship-meta">
-                  <span class={`badge ${p.status === 'Active' ? 'badge-active' : 'badge-done'}`}>
+                  <span
+                    class={`badge ${
+                      p.status === 'Active'
+                        ? 'badge-active'
+                        : p.status === 'Archived'
+                          ? 'badge-archived'
+                          : 'badge-done'
+                    }`}
+                  >
                     {p.status}
                   </span>
                   {p.language && <span class="badge">{p.language}</span>}
@@ -131,7 +143,15 @@ const repositories = PROJECTS.filter((p) => p.category === 'repository');
               data-search={`${p.name} ${p.summary.en} ${p.summary.zh} ${p.tags.join(' ')} ${p.language || ''}`.toLowerCase()}
             >
               <div class="flagship-head">
-                <span class={`badge ${p.status === 'Active' ? 'badge-active' : 'badge-done'}`}>
+                <span
+                  class={`badge ${
+                    p.status === 'Active'
+                      ? 'badge-active'
+                      : p.status === 'Archived'
+                        ? 'badge-archived'
+                        : 'badge-done'
+                  }`}
+                >
                   {p.status}
                 </span>
                 <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" class="repo-link" aria-label={p.name}>

@@ -8,7 +8,7 @@ export interface BilingualText {
 export interface ProjectItem {
   id: string;
   name: string;
-  status: 'Active' | 'Completed';
+  status: 'Active' | 'Completed' | 'Archived';
   category: 'flagship' | 'repository';
   repoUrl: string;
   language?: string;
@@ -84,6 +84,7 @@ export const UI_TEXT = {
     statusAll: { en: 'All', zh: '全部' },
     statusActive: { en: 'Active', zh: '活跃维护' },
     statusCompleted: { en: 'Completed', zh: '已完成' },
+    statusArchived: { en: 'Archived', zh: '已归档' },
     flagshipHeading: { en: 'Flagship Platforms & Models', zh: '核心研究平台与模型' },
     reposHeading: { en: 'Open-Source Repositories (GitHub)', zh: '更多 GitHub 开源仓库' },
     sourceCode: { en: 'Source Code', zh: '源码仓库' },
@@ -232,7 +233,7 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'labelcomp',
     name: 'LabelComp',
-    status: 'Active',
+    status: 'Archived',
     category: 'flagship',
     repoUrl: 'https://github.com/seldas/LabelComp',
     language: 'Python',
@@ -250,7 +251,7 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'llm4ae',
     name: 'LLM4AE',
-    status: 'Active',
+    status: 'Archived',
     category: 'flagship',
     repoUrl: 'https://github.com/seldas/LLM4AE',
     language: 'Python',
@@ -282,7 +283,7 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'ganomics',
     name: 'GANomics',
-    status: 'Completed',
+    status: 'Archived',
     category: 'flagship',
     repoUrl: 'https://github.com/seldas/GANomics',
     language: 'Python / PyTorch',
@@ -296,7 +297,7 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'hetenc',
     name: 'HetEnc',
-    status: 'Completed',
+    status: 'Archived',
     category: 'flagship',
     repoUrl: 'https://github.com/seldas/HetEnc_Code',
     language: 'Python',
