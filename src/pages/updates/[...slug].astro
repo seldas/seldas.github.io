@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const updates = await getCollection('updates');
+  const sorted = updates.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return sorted.map((post, idx) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prev: idx < sorted.length - 1 ? sorted[idx + 1] : null,
+      next: idx > 0 ? sorted[idx - 1] : null,
+    },
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+const { Content } = await render(post);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+---
+
+<BaseLayout title={`${post.data.title} | seldas`} description={post.data.summary}>
+  <div class="container container-narrow">
+    <div class="post-top-nav">
+      <a href="/updates" class="back-link">
+        <span data-lang="en">← Back to Updates</span>
+        <span data-lang="zh">← 返回更新日志</span>
+      </a>
+    </div>
+
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-meta">
+          <time class="mono-date">{formatDate(post.data.date)}</time>
+          <span class="badge badge-accent">Project: {post.data.project}</span>
+        </div>
+        <h1 class="post-title">{post.data.title}</h1>
+        {post.data.tags.length > 0 && (
+          <div class="tag-row">
+            {post.data.tags.map((tag) => (
+              <span class="badge">{tag}</span>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <div class="prose post-body">
+        <Content />
+      </div>
+    </article>
+
+    <nav class="post-pager" aria-label="Post navigation">
+      {
+        prev ? (
+          <a href={`/updates/${prev.id}`} class="pager-card">
+            <span class="pager-label">
+              <span data-lang="en">← Older Entry</span>
+              <span data-lang="zh">← 上一篇</span>
+            </span>
+            <span class="pager-title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+      {
+        next && (
+          <a href={`/updates/${next.id}`} class="pager-card pager-next">
+            <span class="pager-label">
+              <span data-lang="en">Newer Entry →</span>
+              <span data-lang="zh">下一篇 →</span>
+            </span>
+            <span class="pager-title">{next.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .post-top-nav {
+    padding: 2rem 0 1rem;
+  }
+
+  .back-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+  }
+
+  .post-header {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .mono-date {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .post-title {
+    font-size: clamp(1.65rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .post-pager {
+    margin-top: 3.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    transition: border-color 0.15s ease;
+  }
+
+  .pager-card:hover {
+    border-color: var(--accent);
+  }
+
+  .pager-next {
+    text-align: right;
+  }
+
+  .pager-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .pager-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 640px) {
+    .post-pager {
+      grid-template-columns: 1fr;
+    }
+    .pager-next {
+      text-align: left;
+    }
+  }
+</style>

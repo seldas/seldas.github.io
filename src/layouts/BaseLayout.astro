@@ -1,0 +1,286 @@
+---
+import '../styles/global.css';
+import { UI_TEXT } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'seldas | Research Updates',
+  description = 'Personal research updates, notes, and technical tracking for bioinformatics, pharmacovigilance, and clinical NLP projects under github.com/seldas.',
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const isActive = (path: string) =>
+  path === '/' ? pathname === '/' : pathname.startsWith(path);
+---
+
+<!doctype html>
+<html lang="en" data-theme="light" data-lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <script is:inline>
+      (function () {
+        try {
+          const savedTheme = localStorage.getItem('seldas-theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+
+          const savedLang = localStorage.getItem('seldas-lang');
+          const browserZh = navigator.language && navigator.language.toLowerCase().startsWith('zh');
+          const lang = savedLang || (browserZh ? 'zh' : 'en');
+          document.documentElement.setAttribute('data-lang', lang);
+          document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand">
+          <img src="/favicon.svg" alt="SELDAS" class="brand-mark" />
+          <div class="brand-text">
+            <span class="brand-name">SELDAS</span>
+            <span class="brand-sub" data-lang="en">{UI_TEXT.brandSub.en}</span>
+            <span class="brand-sub" data-lang="zh">{UI_TEXT.brandSub.zh}</span>
+          </div>
+        </a>
+
+        <nav class="header-nav" aria-label="Main navigation">
+          <a href="/" class={`nav-link ${isActive('/') ? 'active' : ''}`}>
+            <span data-lang="en">{UI_TEXT.nav.overview.en}</span>
+            <span data-lang="zh">{UI_TEXT.nav.overview.zh}</span>
+          </a>
+          <a href="/projects" class={`nav-link ${isActive('/projects') ? 'active' : ''}`}>
+            <span data-lang="en">{UI_TEXT.nav.projects.en}</span>
+            <span data-lang="zh">{UI_TEXT.nav.projects.zh}</span>
+          </a>
+          <a href="/research" class={`nav-link ${isActive('/research') ? 'active' : ''}`}>
+            <span data-lang="en">{UI_TEXT.nav.research.en}</span>
+            <span data-lang="zh">{UI_TEXT.nav.research.zh}</span>
+          </a>
+          <a href="/updates" class={`nav-link ${isActive('/updates') ? 'active' : ''}`}>
+            <span data-lang="en">{UI_TEXT.nav.updates.en}</span>
+            <span data-lang="zh">{UI_TEXT.nav.updates.zh}</span>
+          </a>
+        </nav>
+
+        <div class="header-controls">
+          <button type="button" class="search-trigger" id="open-search-btn" aria-label="Search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="search-label" data-lang="en">{UI_TEXT.search.trigger.en}</span>
+            <span class="search-label" data-lang="zh">{UI_TEXT.search.trigger.zh}</span>
+            <span class="kbd">⌘K</span>
+          </button>
+
+          <button type="button" class="icon-btn" id="lang-toggle-btn" title="Switch Language">
+            <span data-lang="en">中文</span>
+            <span data-lang="zh">EN</span>
+          </button>
+
+          <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme">
+            <svg class="sun-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p style="margin: 0;">
+          <span data-lang="en">{UI_TEXT.footer.builtWith.en}</span>
+          <span data-lang="zh">{UI_TEXT.footer.builtWith.zh}</span>
+        </p>
+        <div class="footer-links">
+          <a href="https://github.com/seldas" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <span>·</span>
+          <a href="https://github.com/seldas/askFDALabel-v5" target="_blank" rel="noopener noreferrer">AskFDALabel</a>
+          <span>·</span>
+          <a href="https://github.com/seldas/LabelComp" target="_blank" rel="noopener noreferrer">LabelComp</a>
+          <span>·</span>
+          <a href="https://github.com/seldas/LLM4AE" target="_blank" rel="noopener noreferrer">LLM4AE</a>
+          <span>·</span>
+          <a href="https://github.com/seldas/HetEnc_Code" target="_blank" rel="noopener noreferrer">HetEnc</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Global Search Modal -->
+    <div class="search-modal-backdrop" id="search-modal" aria-hidden="true">
+      <div class="search-modal" role="dialog" aria-modal="true" aria-label="Site Search">
+        <div class="search-modal-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted)">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="global-search-input"
+            class="search-modal-input"
+            placeholder="Search updates, projects, papers, or tags..."
+            autocomplete="off"
+          />
+          <button type="button" class="kbd" id="close-search-btn" style="cursor: pointer;">ESC</button>
+        </div>
+        <div class="search-modal-results" id="global-search-results">
+          <p style="padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+            <span data-lang="en">{UI_TEXT.search.empty.en}</span>
+            <span data-lang="zh">{UI_TEXT.search.empty.zh}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme Toggle
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      themeBtn?.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('seldas-theme', next);
+      });
+
+      // Language Toggle
+      const langBtn = document.getElementById('lang-toggle-btn');
+      const syncPlaceholders = (lang: string) => {
+        document.querySelectorAll<HTMLInputElement>('[data-placeholder-en]').forEach((el) => {
+          const val = lang === 'zh' ? el.dataset.placeholderZh : el.dataset.placeholderEn;
+          if (val) el.placeholder = val;
+        });
+        const modalInput = document.getElementById('global-search-input') as HTMLInputElement | null;
+        if (modalInput) {
+          modalInput.placeholder =
+            lang === 'zh'
+              ? '搜索更新日志、项目、论文或技术标签...'
+              : 'Search updates, projects, papers, or tags...';
+        }
+      };
+
+      syncPlaceholders(document.documentElement.getAttribute('data-lang') || 'en');
+
+      langBtn?.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-lang') || 'en';
+        const next = cur === 'en' ? 'zh' : 'en';
+        document.documentElement.setAttribute('data-lang', next);
+        document.documentElement.setAttribute('lang', next === 'zh' ? 'zh-CN' : 'en');
+        localStorage.setItem('seldas-lang', next);
+        syncPlaceholders(next);
+        window.dispatchEvent(new CustomEvent('seldas-lang-change', { detail: { lang: next } }));
+      });
+
+      // Global Search Modal
+      const modal = document.getElementById('search-modal');
+      const openBtn = document.getElementById('open-search-btn');
+      const closeBtn = document.getElementById('close-search-btn');
+      const searchInput = document.getElementById('global-search-input') as HTMLInputElement | null;
+      const resultsEl = document.getElementById('global-search-results');
+
+      let searchIndex: any[] | null = null;
+
+      async function ensureIndex() {
+        if (searchIndex) return searchIndex;
+        const res = await fetch('/search-index.json');
+        searchIndex = await res.json();
+        return searchIndex!;
+      }
+
+      function openModal() {
+        modal?.classList.add('open');
+        modal?.setAttribute('aria-hidden', 'false');
+        setTimeout(() => searchInput?.focus(), 20);
+        ensureIndex();
+      }
+
+      function closeModal() {
+        modal?.classList.remove('open');
+        modal?.setAttribute('aria-hidden', 'true');
+      }
+
+      openBtn?.addEventListener('click', openModal);
+      closeBtn?.addEventListener('click', closeModal);
+      modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          modal?.classList.contains('open') ? closeModal() : openModal();
+        } else if (e.key === 'Escape' && modal?.classList.contains('open')) {
+          closeModal();
+        }
+      });
+
+      searchInput?.addEventListener('input', async () => {
+        const q = searchInput.value.trim().toLowerCase();
+        if (!resultsEl) return;
+        const lang = document.documentElement.getAttribute('data-lang') || 'en';
+        if (!q) {
+          resultsEl.innerHTML = `<p style="padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin: 0;">${
+            lang === 'zh'
+              ? '输入关键词，即时检索 50+ 篇研究日志、开源项目与论文成果。'
+              : 'Type to search across 50+ research logs, projects, and papers.'
+          }</p>`;
+          return;
+        }
+        const items = await ensureIndex();
+        const matches = items
+          .filter((item) => {
+            const hay = `${item.title} ${item.subtitle} ${(item.tags || []).join(' ')}`.toLowerCase();
+            return hay.includes(q);
+          })
+          .slice(0, 18);
+
+        if (matches.length === 0) {
+          resultsEl.innerHTML = `<p style="padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin: 0;">${
+            lang === 'zh' ? '未找到匹配的结果。' : 'No matching results found.'
+          }</p>`;
+          return;
+        }
+
+        resultsEl.innerHTML = matches
+          .map(
+            (m) => `
+          <a href="${m.url}" class="search-result-item">
+            <div class="search-result-top">
+              <span class="search-result-title">${m.title}</span>
+              <span class="badge">${m.type}</span>
+            </div>
+            <span class="search-result-desc">${m.subtitle}</span>
+          </a>
+        `
+          )
+          .join('');
+      });
+    </script>
+  </body>
+</html>

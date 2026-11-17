@@ -1,7 +1,9 @@
 ---
 title: "Research Blog & Portfolio Launch"
-date: "2026-04-30"
+date: 2026-04-30
+project: "general"
 tags: ["Meta", "Astro", "GitHub Pages"]
+summary: "Welcome to my personal research updates log! This space will be used to share ongoing progress, experiment results, code releases, and papers related to my work in Bioinformatics, Deep Learning, and Clinical NLP ."
 ---
 
 Welcome to my personal research updates log! This space will be used to share ongoing progress, experiment results, code releases, and papers related to my work in **Bioinformatics, Deep Learning, and Clinical NLP**.

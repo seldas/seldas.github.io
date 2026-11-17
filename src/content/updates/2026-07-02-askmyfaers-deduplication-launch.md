@@ -1,13 +1,15 @@
 ---
 title: "AskMyFAERS: Case-Series Deduplication Ships"
-date: "2026-07-02"
+date: 2026-07-02
 project: "askmyfaers"
 tags: ["Deduplication", "QC", "Performance"]
+summary: "This week we shipped case-series deduplication end to end: bucketing and analysis skills, an adjudication UI, and a side-by-side duplicate comparison view."
 ---
 
 This week we shipped case-series deduplication end to end: bucketing and analysis skills, an adjudication UI, and a side-by-side duplicate comparison view.
 
 ### Key Milestones
+
 - **Bucketing & Analysis Skills:** Built the case-series deduplication pipeline as separate bucketing and analysis skills, with version grouping, refined bucketing rules, a synchronous run mode, and a full-reset option.
 - **Adjudication UI:** Consolidated duplicate adjudication into the Dedup Buckets tab, added a Duplicated tag, and built a side-by-side duplicate comparison view showing AI reasoning and confidence scores with support for partial merges.
 - **Bucket Page Refinements:** Made the Buckets column collapsible and moved it left in the case list, added per-bucket case comparison, and surfaced resolved dedup status on the bucket page instead of hiding it; merged duplicates now have bucket tags stripped and are excluded from re-bucketing.
