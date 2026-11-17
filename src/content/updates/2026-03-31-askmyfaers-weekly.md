@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Environment Routing & Base Path Fixes"
+title: "askAEMS: Environment Routing & Base Path Fixes"
 date: 2026-03-31
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Routing", "System Configuration"]
 summary: "This week we unified deployment setups to establish consistent endpoint paths for sub-directory routing."
 ---

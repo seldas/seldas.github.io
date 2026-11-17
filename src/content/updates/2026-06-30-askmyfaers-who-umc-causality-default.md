@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: WHO-UMC Causality Assessment Becomes the Default"
+title: "askAEMS: WHO-UMC Causality Assessment Becomes the Default"
 date: 2026-06-30
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["WHO-UMC", "Causality Assessment", "Quality Control"]
 summary: "This week we introduced the WHO-UMC two-phase causality assessment method, built it into a guided rule-by-rule verification flow, and added an AI-based Quality Control panel that cross-checks case data against openFDA."
 ---

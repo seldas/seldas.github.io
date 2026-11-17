@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Project/Case Series Streamlining"
+title: "askAEMS: Project/Case Series Streamlining"
 date: 2026-05-21
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Project Redundancy", "Database Schema"]
 summary: "This week we redesigned the project configuration workflow to reduce duplicate structures between Projects and Case Series."
 ---

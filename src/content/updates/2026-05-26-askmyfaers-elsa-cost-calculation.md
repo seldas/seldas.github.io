@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Elsa Cost Calibration & PostgreSQL Fixes"
+title: "askAEMS: Elsa Cost Calibration & PostgreSQL Fixes"
 date: 2026-05-26
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Cost Tracking", "PostgreSQL", "System Stability"]
 summary: "Today we calibrated the Elsa clinical model API cost calculations and resolved several runtime database connection errors."
 ---

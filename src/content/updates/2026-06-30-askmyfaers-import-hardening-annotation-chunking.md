@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Import Pipeline Hardening & Annotation Chunking Rework"
+title: "askAEMS: Import Pipeline Hardening & Annotation Chunking Rework"
 date: 2026-06-30
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["ICSR Import", "Narrative Annotation", "Data Quality"]
 summary: "This week we hardened the ICSR import pipeline with canonical column normalization and openFDA syncing, and reworked narrative annotation into smaller paragraph-aware AI passes."
 ---

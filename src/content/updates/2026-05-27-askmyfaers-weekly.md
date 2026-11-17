@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Consensus Matrix Adjudication Grid & Dev Server Configurations"
+title: "askAEMS: Consensus Matrix Adjudication Grid & Dev Server Configurations"
 date: 2026-05-27
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Consensus Matrix", "FastAPI", "Testing"]
 summary: "This week we introduced the Consensus Matrix feature for collaborative ICSR reviews, cleaned up deprecated batch AI settings, and optimized independent dev and production server subpath configurations."
 ---

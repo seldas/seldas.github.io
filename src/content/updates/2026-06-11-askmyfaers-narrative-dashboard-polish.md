@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Narrative Highlight Sync & Dashboard Decluttering"
+title: "askAEMS: Narrative Highlight Sync & Dashboard Decluttering"
 date: 2026-06-11
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Narrative Annotation", "UI Refactor", "Settings"]
 summary: "This week we tightened narrative-to-annotation click coordination, decluttered the project analytics dashboard, and standardized prompt naming and settings versioning."
 ---

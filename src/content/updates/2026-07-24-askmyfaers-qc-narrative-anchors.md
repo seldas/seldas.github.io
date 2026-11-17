@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Stage-1 QC Narrative Anchors & Discrepancy Filtering"
+title: "askAEMS: Stage-1 QC Narrative Anchors & Discrepancy Filtering"
 date: 2026-07-24
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Quality Control", "Filtering"]
 summary: "This week we extended Stage 1 Quality Control with narrative anchor extraction and added dedicated filters for openFDA versus narrative discrepancies."
 ---

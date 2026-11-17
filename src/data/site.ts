@@ -148,8 +148,8 @@ export const RESEARCH_FOCUS = [
 
 export const PROJECTS: ProjectItem[] = [
   {
-    id: 'askmyfaers',
-    name: 'AskMyFAERS',
+    id: 'askaems',
+    name: 'askAEMS',
     status: 'Active',
     category: 'flagship',
     repoUrl: 'https://github.com/seldas/autonomous_pv_pipeline',
@@ -160,8 +160,8 @@ export const PROJECTS: ProjectItem[] = [
       zh: '专业级药物警戒（PV）分析平台，用于安全、深入地审查与标注个例安全性报告（ICSRs）。',
     },
     description: {
-      en: 'AskMyFAERS is a dedicated pharmacovigilance safety platform built to optimize clinical safety case annotations and causality assessments. By utilizing asynchronous task workers, it processes narratives and produces standardized safety logs.',
-      zh: 'AskMyFAERS 专为优化临床安全性病例标注与因果关系评估而构建。通过异步任务工作流，平台可高效处理病例叙述文本并生成标准化安全性审查日志。',
+      en: 'askAEMS is a dedicated pharmacovigilance safety platform built to optimize clinical safety case annotations and causality assessments. By utilizing asynchronous task workers, it processes narratives and produces standardized safety logs.',
+      zh: 'askAEMS 专为优化临床安全性病例标注与因果关系评估而构建。通过异步任务工作流，平台可高效处理病例叙述文本并生成标准化安全性审查日志。',
     },
     highlights: [
       {

@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Analysis Pipeline & Collapsible Sidebar"
+title: "askAEMS: Analysis Pipeline & Collapsible Sidebar"
 date: 2026-04-18
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["User Interface", "PV Pipeline"]
 summary: "This week we restructured the individual case safety report (ICSR) dashboard, substituting the overcrowded detail views with a modern, collapsible sidebar and a 5-stage analysis pipeline ."
 ---

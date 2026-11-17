@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: SCAT Integration & Fuzzy Offset Alignment"
+title: "askAEMS: SCAT Integration & Fuzzy Offset Alignment"
 date: 2026-04-25
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["SCAT Integration", "Offset Alignment"]
 summary: "This week we completed integration with the external SCAT annotation service and resolved character offset misalignments in case narrative imports."
 ---

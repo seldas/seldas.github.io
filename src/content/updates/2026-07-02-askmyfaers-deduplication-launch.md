@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Case-Series Deduplication Ships"
+title: "askAEMS: Case-Series Deduplication Ships"
 date: 2026-07-02
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Deduplication", "QC", "Performance"]
 summary: "This week we shipped case-series deduplication end to end: bucketing and analysis skills, an adjudication UI, and a side-by-side duplicate comparison view."
 ---

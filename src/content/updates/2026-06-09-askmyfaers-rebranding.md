@@ -1,12 +1,12 @@
 ---
-title: "AskMyFAERS: Branding Rename to askMyICSRs"
+title: "askAEMS: Branding Rename to askMyICSRs"
 date: 2026-06-09
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Branding", "UI Refactor"]
-summary: "Today we updated the core application branding across the layouts, renaming the platform from AskMyFAERS to askMyICSRs to reflect the focus on Individual Case Safety Reports."
+summary: "Today we updated the core application branding across the layouts, renaming the platform from askAEMS to askMyICSRs to reflect the focus on Individual Case Safety Reports."
 ---
 
-Today we updated the core application branding across the layouts, renaming the platform from AskMyFAERS to **askMyICSRs** to reflect the focus on Individual Case Safety Reports.
+Today we updated the core application branding across the layouts, renaming the platform from askAEMS to **askMyICSRs** to reflect the focus on Individual Case Safety Reports.
 
 ### Key Milestones
 

@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: SCAT Annotator Layout Refactor & Verified Badges"
+title: "askAEMS: SCAT Annotator Layout Refactor & Verified Badges"
 date: 2026-07-20
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["SCAT", "Narrative Annotation", "UI Refactor"]
 summary: "This week we reconciled the SCAT annotator’s layout with the rest of AskMyICSRs and added verified/AI-origin badges to narrative annotations."
 ---

@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Celery Task Admin Overhaul & Causality Card Redesign"
+title: "askAEMS: Celery Task Admin Overhaul & Causality Card Redesign"
 date: 2026-06-18
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Admin Panel", "Celery", "Causality Assessment", "ICSR List"]
 summary: "This week we migrated background batch tasks to Celery with proper stale-task handling, rebuilt the Causality Assessment results as color-coded cards, and cleaned up ICSR list filtering."
 ---

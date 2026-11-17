@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Step-by-Step Causality Verification & Clinical Timeline Redesign"
+title: "askAEMS: Step-by-Step Causality Verification & Clinical Timeline Redesign"
 date: 2026-06-28
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Causality Assessment", "HITL", "Clinical Timeline"]
 summary: "This week we rebuilt causality human-in-the-loop review as a formal step-by-step verification flow, redesigned the clinical timeline, and added AI-grounded auto-determination of drug/event pairs."
 ---

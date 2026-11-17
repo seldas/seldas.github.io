@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: Dedup Eval Panel & Research Monitor"
+title: "askAEMS: Dedup Eval Panel & Research Monitor"
 date: 2026-07-04
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Deduplication", "QC", "Research"]
 summary: "This week we built tooling to evaluate and tune the deduplication skill against ground truth, including a Dedup Eval panel and a Research Monitor for the skill-refinement study."
 ---

@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: LLM Token Tracking & Dashboard Integration"
+title: "askAEMS: LLM Token Tracking & Dashboard Integration"
 date: 2026-05-25
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Monitoring", "FastAPI", "Token Tracking"]
 summary: "Today we introduced token usage monitoring features to provide administrative visibility into LLM resource utilization during large-scale ICSR review campaigns."
 ---

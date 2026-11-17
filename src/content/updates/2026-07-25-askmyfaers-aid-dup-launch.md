@@ -1,7 +1,7 @@
 ---
-title: "AskMyFAERS: AID-Dup Replaces the Deduplication Pipeline"
+title: "askAEMS: AID-Dup Replaces the Deduplication Pipeline"
 date: 2026-07-25
-project: "askmyfaers"
+project: "askAEMS"
 tags: ["Deduplication", "AID-Dup", "Clustering"]
 summary: "This week we replaced the deduplication pipeline with AID-Dup — multi-signal bucketing, chaining-resistant clustering, and parallel AI rescue — and later upgraded its clustering to a true Clauset-Newman-Moore..."
 ---
